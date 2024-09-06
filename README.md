@@ -127,11 +127,28 @@ nano ~/.bash_profile
 Romove all PATH lines in ~/.bash_profile && Adjust the PATH line to :
 ```
 export PATH=$HOME/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+export PATH=$PATH:$HOME/go/bin
+
 ```
 
 Save and exit (Ctrl + O, Enter, Ctrl + X), then reload the profile:
 ```
 source ~/.bash_profile
+```
+
+Open the .bashrc file:
+```
+nano ~/.bashrc
+```
+
+Add this line if it’s missing:
+```
+export PATH=$PATH:$HOME/go/bin
+```
+
+Save and exit (Ctrl + O, Enter, Ctrl + X), then reload the profile:
+```
+source ~/.bashrc
 ```
 
 Recheck story Command:
