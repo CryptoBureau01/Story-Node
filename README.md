@@ -27,6 +27,7 @@ sudo apt-get update
 sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y
 ```
 
+
 ## Install Go
 
 ```
@@ -40,6 +41,7 @@ echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile && \
 source ~/.bash_profile && \
 go version
 ```
+
 
 ## Download Story-Geth binary
 
@@ -55,6 +57,7 @@ source $HOME/.bash_profile
 story-geth version
 ```
 
+
 ## Download Story binary
 
 ```
@@ -68,6 +71,8 @@ sudo cp story-linux-amd64-0.9.11-2a25df1/story $HOME/go/bin/story
 source $HOME/.bash_profile
 story version
 ```
+
+
 
 ## Story Version
 
@@ -104,6 +109,37 @@ Run the story command to check its version
 $HOME/go/bin/story version
 ```
 
+You can remove or rename it to avoid conflicts:
+```
+sudo mv /snap/bin/story /snap/bin/story.old
+```
+
+Check Binary Location:
+```
+/root/go/bin/story version
+```
+
+Update PATH and open ~/.bash_profile :
+```
+nano ~/.bash_profile
+```
+
+Romove all PATH lines in ~/.bash_profile && Adjust the PATH line to :
+```
+export PATH=$HOME/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
+```
+
+Save and exit (Ctrl + O, Enter, Ctrl + X), then reload the profile:
+```
+source ~/.bash_profile
+```
+
+Recheck story Command:
+```
+story version
+```
+
+
 ## Initiate Iliad node
 
 Replace "Your_moniker_name" with any name you want 
@@ -112,6 +148,8 @@ Replace "Your_moniker_name" with any name you want
 ```
 story init --network iliad --moniker "Your_moniker_name"
 ```
+
+
 ### Peers setup
 ```
 PEERS=$(curl -s -X POST https://rpc-story.josephtran.xyz -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"net_info","params":[],"id":1}' | jq -r '.result.peers[] | select(.connection_status.SendMonitor.Active == true) | "\(.node_info.id)@\(if .node_info.listen_addr | contains("0.0.0.0") then .remote_ip + ":" + (.node_info.listen_addr | sub("tcp://0.0.0.0:"; "")) else .node_info.listen_addr | sub("tcp://"; "") end)"' | tr '\n' ',' | sed 's/,$//' | awk '{print "\"" $0 "\""}')
@@ -143,6 +181,7 @@ LimitNOFILE=4096
 WantedBy=multi-user.target
 EOF
 ```
+
 ## Create story service file
 
 ```
@@ -173,6 +212,8 @@ sudo systemctl start story && \
 sudo systemctl status story-geth
 ```
 
+
+
 # Check logs
 
 ### Geth logs
@@ -188,6 +229,8 @@ sudo journalctl -u story -f -o cat
 ```
 curl localhost:26657/status | jq
 ```
+
+
 
 # SYNC using snapshot File
 
@@ -249,6 +292,8 @@ mv $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_va
 sudo systemctl start story
 sudo systemctl start story-geth
 ```
+
+
 
 # Register your Validator
 
