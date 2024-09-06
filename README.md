@@ -73,33 +73,34 @@ story version
 
 Story Version Fix & Check
 
+
+Check if the story binary exists and its permissions
 ```
-# Check if the story binary exists and its permissions
 ls -l $HOME/go/bin/story
 ```
 
+Make sure the binary is executable
 ```
-# Make sure the binary is executable
 chmod +x $HOME/go/bin/story
 ```
 
+Check the file type of the binary
 ```
-# Check the file type of the binary
 file $HOME/go/bin/story
 ```
 
+Verify the PATH variable
 ```
-# Verify the PATH variable
 echo $PATH
 ```
 
+Reload the .bash_profile to apply any PATH changes
 ```
-# Reload the .bash_profile to apply any PATH changes
 source ~/.bash_profile
 ```
 
+Run the story command to check its version
 ```
-# Run the story command to check its version
 $HOME/go/bin/story version
 ```
 
