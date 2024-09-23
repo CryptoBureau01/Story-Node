@@ -335,6 +335,11 @@ Restart the Story Node
 sudo systemctl start story
 ```
 
+Check Story Version v0.10.0
+```
+story version
+```
+
 Ensure your node is running correctly by checking the logs:
 ```
 journalctl -u story -f
