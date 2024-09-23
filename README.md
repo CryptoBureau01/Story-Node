@@ -304,12 +304,41 @@ lz4 -d Geth_snapshot.lz4 | pv | sudo tar xv -C /root/.story/geth/iliad/geth/
 ```
 mv $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json
 ```
+
+
 ### Restart node 
 ```
 sudo systemctl start story
 sudo systemctl start story-geth
 ```
 
+
+### Upgrade to Story v0.10.0
+
+Stop the Existing Story Client
+```
+sudo systemctl stop story
+```
+
+Download and extract the Story v0.10.0 binary
+```
+curl -L https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.10.0-9603826.tar.gz | tar -xz
+```
+
+Replace the Old Binary with the New One
+```
+sudo cp story-linux-amd64-0.10.0-9603826/story /usr/local/bin/story
+```
+
+Restart the Story Node
+```
+sudo systemctl start story
+```
+
+Ensure your node is running correctly by checking the logs:
+```
+journalctl -u story -f
+```
 
 
 # Register your Validator
