@@ -346,6 +346,57 @@ journalctl -u story -f
 ```
 
 
+# Upgrade to Story-Geth v0.9.3 version
+
+### Download and extract Story-Geth v0.9.3 version
+
+```
+wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/geth-public/geth-linux-amd64-0.9.3-b224fdf.tar.gz
+tar -xvzf geth-linux-amd64-0.9.3-b224fdf.tar.gz
+```
+
+### Stop Story and Story-Geth
+
+```
+sudo systemctl stop story
+sudo systemctl stop story-geth
+```
+
+### Copy the new version of Story-Geth
+
+```
+sudo cp $HOME/geth-linux-amd64-0.9.3-b224fdf/geth $HOME/go/bin/story-geth
+```
+
+### Restart Story and Story-Geth 
+
+```
+sudo systemctl start story
+sudo systemctl start story-geth
+```
+
+# Check Logs
+
+### Geth logs
+```
+sudo journalctl -u story-geth -f -o cat
+```
+### Story logs
+```
+sudo journalctl -u story -f -o cat
+```
+### Check sync status
+
+```
+curl localhost:26657/status | jq
+```
+
+### Ensure your node is running correctly by checking the logs:
+```
+journalctl -u story -f
+```
+
+
 # Register your Validator
 
 ### 1. Export wallet:
