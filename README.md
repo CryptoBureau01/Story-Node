@@ -335,12 +335,17 @@ tar -xzvf story-linux-amd64-0.10.1-57567e5.tar.gz
 sudo cp story-linux-amd64-0.10.1-57567e5/story /usr/local/bin/story
 ```
 
+### Set new Binary 
+```
+sudo cp story-linux-amd64-0.10.1-57567e5/story $HOME/go/bin/
+```
+
 ### Restart the Story Node
 ```
 sudo systemctl start story
 ```
 
-### Check Story Version v0.10.0
+### Check Story Version v0.10.1
 ```
 story version
 ```
