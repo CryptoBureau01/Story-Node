@@ -287,7 +287,7 @@ cd $HOME && rm -f Story_snapshot.lz4 && wget -O story_snapshot.lz4 https://snaps
 
 ### Unzip Geth Snapshot file 
 ```
-lz4 -c -d geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth
+lz4 -c -d Geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth
 ```
 
 ### Unzip Story-data Snapshot file 
