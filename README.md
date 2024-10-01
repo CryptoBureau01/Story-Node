@@ -298,7 +298,7 @@ lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story
 
 ### Remove old data
 ```
-sudo rm -v geth_snapshot.lz4
+sudo rm -v Geth_snapshot.lz4
 sudo rm -v story_snapshot.lz4
 ```
 
