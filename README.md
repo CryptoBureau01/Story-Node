@@ -296,12 +296,6 @@ lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story
 ```
 
 
-### Remove old data
-```
-sudo rm -v Geth_snapshot.lz4
-sudo rm -v story_snapshot.lz4
-```
-
 ### Backup priv_validator_state.json:
 ```
 sudo cp $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json
