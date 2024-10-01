@@ -251,60 +251,61 @@ curl localhost:26657/status | jq
 
 # SYNC using snapshot File
 
-C2 Joseph Tran
+**Apply Mandragora snapshots (story client+story-geth)**
+
+Check the height of the snapshot (v0.10.1): Block Number -> 1016207
+
+
+### install lz4
+```
+sudo apt-get install wget lz4 -y
+```
+
 
 ### Stop node
 ```
 sudo systemctl stop story
 sudo systemctl stop story-geth
 ```
-### Download Geth-data
-```
-cd $HOME
-rm -f Geth_snapshot.lz4
-if curl -s --head https://vps6.josephtran.xyz/Story/Geth_snapshot.lz4 | head -n 1 | grep "200" > /dev/null; then
-    echo "Snapshot found, downloading..."
-    aria2c -x 16 -s 16 https://vps6.josephtran.xyz/Story/Geth_snapshot.lz4 -o Geth_snapshot.lz4
-else
-    echo "No snapshot found."
-fi
-```
-### Download Story-data
-```
-cd $HOME
-rm -f Story_snapshot.lz4
-if curl -s --head https://vps6.josephtran.xyz/Story/Story_snapshot.lz4 | head -n 1 | grep "200" > /dev/null; then
-    echo "Snapshot found, downloading..."
-    aria2c -x 16 -s 16 https://vps6.josephtran.xyz/Story/Story_snapshot.lz4 -o Story_snapshot.lz4
-else
-    echo "No snapshot found."
-fi
-```
+
+
 ### Backup priv_validator_state.json:
 ```
-mv $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv_validator_state.json.backup
+sudo cp $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv_validator_state.json.backup
 ```
+
+### Download Geth-data
+```
+cd $HOME && rm -f Geth_snapshot.lz4 && wget -O Geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4
+```
+
+### Download Story-data
+```
+cd $HOME && rm -f Story_snapshot.lz4 && wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4
+
+```
+
+### Unzip Geth Snapshot file 
+```
+lz4 -c -d geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth
+```
+
+### Unzip Story-data Snapshot file 
+```
+lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story
+```
+
+
 ### Remove old data
 ```
-rm -rf ~/.story/story/data
-rm -rf ~/.story/geth/iliad/geth/chaindata
-```
-### Extract Story-data
-```
-sudo mkdir -p /root/.story/story/data
-lz4 -d Story_snapshot.lz4 | pv | sudo tar xv -C /root/.story/story/
-```
-### Extract Geth-data
-```
-sudo mkdir -p /root/.story/geth/iliad/geth/chaindata
-lz4 -d Geth_snapshot.lz4 | pv | sudo tar xv -C /root/.story/geth/iliad/geth/
-```
-### Move priv_validator_state.json back
-
-```
-mv $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json
+sudo rm -v geth_snapshot.lz4
+sudo rm -v story_snapshot.lz4
 ```
 
+### Backup priv_validator_state.json:
+```
+sudo cp $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json
+```
 
 ### Restart node 
 ```
@@ -322,22 +323,23 @@ sudo systemctl stop story
 
 ### Download and extract the Story v0.10.1 binary
 ```
-curl -L -o story-linux-amd64-0.10.1-57567e5.tar.gz https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.10.1-57567e5.tar.gz
+cd $HOME && \
+wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.10.1-57567e5.tar.gz
 ```
 
-### unzip tar file
+### unzip Story v0.10.1 binary
 ```
-tar -xzvf story-linux-amd64-0.10.1-57567e5.tar.gz
+tar -xzf story-linux-amd64-0.10.1-57567e5.tar.gz
 ```
 
 ### Replace the Old Binary with the New One
 ```
-sudo cp story-linux-amd64-0.10.1-57567e5/story /usr/local/bin/story
+sudo cp story-linux-amd64-0.10.1-57567e5/story $HOME/go/bin
 ```
 
 ### Set new Binary 
 ```
-sudo cp story-linux-amd64-0.10.1-57567e5/story $HOME/go/bin/
+sudo cp story-linux-amd64-0.10.1-57567e5/story /usr/local/bin
 ```
 
 ### Restart the Story Node
