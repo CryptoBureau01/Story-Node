@@ -171,6 +171,19 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 
 
 
+# Node Reload : 
+
+   ## stop node 
+
+    sudo systemctl stop story
+    sudo systemctl stop story-geth
+
+
+  ## Start Node 
+
+    sudo systemctl start story
+    sudo systemctl start story-geth
+
 
 # Register your Validator
 
