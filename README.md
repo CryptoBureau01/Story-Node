@@ -172,57 +172,25 @@ curl localhost:26657/status | jq
 Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 
 
-### install lz4
-```
-sudo apt-get install wget lz4 -y
-```
+
+## Download Sync-Snapshots File : 
+    
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/sync-snapshots.sh
 
 
-### Stop node
-```
-sudo systemctl stop story
-sudo systemctl stop story-geth
-```
+
+## Make the script executable :
+    
+    chmod +x sync-snapshots.sh
+    
+
+## Run the script to update the Story version :
+    
+    ./sync-snapshots.sh
+    
 
 
-### Backup priv_validator_state.json:
-```
-sudo cp $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv_validator_state.json.backup
-```
-
-### Download Geth-data
-```
-cd $HOME && rm -f Geth_snapshot.lz4 && wget -O Geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4
-```
-
-### Download Story-data
-```
-cd $HOME && rm -f Story_snapshot.lz4 && wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4
-
-```
-
-### Unzip Geth Snapshot file 
-```
-lz4 -c -d Geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth
-```
-
-### Unzip Story-data Snapshot file 
-```
-lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story
-```
-
-
-### Backup priv_validator_state.json:
-```
-sudo cp $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json
-```
-
-### Restart node 
-```
-sudo systemctl start story
-sudo systemctl start story-geth
-```
-
+    
 
 # Upgrade to Story v0.11.1
 
@@ -257,7 +225,6 @@ journalctl -u story -f
     cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-geth-v0.9.3.sh
 
     
-
 
 ## Make the script executable :
     
