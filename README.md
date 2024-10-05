@@ -228,20 +228,20 @@ sudo systemctl start story-geth
 
 
 ## Download Story v0.11.1 File : 
-    ```
+    
     cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-v0.11.1.sh
-    ```
+    
 
 
 ## Make the script executable :
-    ```
+    
     chmod +x story-v0.11.0.sh
-    ```
+    
 
 ## Run the script to update the Story version :
-    ```
+    
     ./story-v0.11.0.sh
-    ```
+    
 
 
 
