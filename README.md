@@ -73,90 +73,6 @@ story version
 ```
 
 
-
-## Story Version
-
-Story Version Fix & Check
-
-
-Check if the story binary exists and its permissions
-```
-ls -l $HOME/go/bin/story
-```
-
-Make sure the binary is executable
-```
-chmod +x $HOME/go/bin/story
-```
-
-Check the file type of the binary
-```
-file $HOME/go/bin/story
-```
-
-Verify the PATH variable
-```
-echo $PATH
-```
-
-Reload the .bash_profile to apply any PATH changes
-```
-source ~/.bash_profile
-```
-
-Run the story command to check its version
-```
-$HOME/go/bin/story version
-```
-
-You can remove or rename it to avoid conflicts:
-```
-sudo mv /snap/bin/story /snap/bin/story.old
-```
-
-Check Binary Location:
-```
-/root/go/bin/story version
-```
-
-Update PATH and open ~/.bash_profile :
-```
-nano ~/.bash_profile
-```
-
-Romove all PATH lines in ~/.bash_profile && Adjust the PATH line to :
-```
-export PATH=$HOME/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin:/usr/local/go/bin
-export PATH=$PATH:$HOME/go/bin
-
-```
-
-Save and exit (Ctrl + O, Enter, Ctrl + X), then reload the profile:
-```
-source ~/.bash_profile
-```
-
-Open the .bashrc file:
-```
-nano ~/.bashrc
-```
-
-Add this line if it’s missing:
-```
-export PATH=$PATH:$HOME/go/bin
-```
-
-Save and exit (Ctrl + O, Enter, Ctrl + X), then reload the profile:
-```
-source ~/.bashrc
-```
-
-Recheck story Command:
-```
-story version
-```
-
-
 ## Initiate Iliad node
 
 Replace "Your_moniker_name" with any name you want 
@@ -308,7 +224,11 @@ sudo systemctl start story-geth
 ```
 
 
-# Upgrade to Story v0.10.1
+# Upgrade to Story v0.11.1
+
+
+
+
 
 ### Stop the Existing Story Client
 ```
