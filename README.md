@@ -243,44 +243,6 @@ sudo systemctl start story-geth
     ./story-v0.11.0.sh
     
 
-
-
-### Stop the Existing Story Client
-```
-sudo systemctl stop story
-```
-
-### Download and extract the Story v0.10.1 binary
-```
-cd $HOME && \
-wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.10.1-57567e5.tar.gz
-```
-
-### unzip Story v0.10.1 binary
-```
-tar -xzf story-linux-amd64-0.10.1-57567e5.tar.gz
-```
-
-### Replace the Old Binary with the New One
-```
-sudo cp story-linux-amd64-0.10.1-57567e5/story $HOME/go/bin
-```
-
-### Set new Binary 
-```
-sudo cp story-linux-amd64-0.10.1-57567e5/story /usr/local/bin
-```
-
-### Restart the Story Node
-```
-sudo systemctl start story
-```
-
-### Check Story Version v0.10.1
-```
-story version
-```
-
 ### Ensure your node is running correctly by checking the logs:
 ```
 journalctl -u story -f
