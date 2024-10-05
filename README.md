@@ -19,61 +19,20 @@ Follow our TG : https://t.me/CryptoBuroOfficial
 
 
 
-## Install dependencies
-
-```
-sudo apt update
-sudo apt-get update
-sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y
-```
 
 
-## Install Go
+# Setup Story Install dependencies
 
-```
-cd $HOME && \
-ver="1.22.0" && \
-wget "https://golang.org/dl/go$ver.linux-amd64.tar.gz" && \
-sudo rm -rf /usr/local/go && \
-sudo tar -C /usr/local -xzf "go$ver.linux-amd64.tar.gz" && \
-rm "go$ver.linux-amd64.tar.gz" && \
-echo "export PATH=$PATH:/usr/local/go/bin:$HOME/go/bin" >> ~/.bash_profile && \
-source ~/.bash_profile && \
-go version
-```
+  ## Install && run its automatically : 
+
+  ```
+
+  cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/setup.sh && chmod +x setup.sh && ./setup.sh
+  ```
 
 
-## Download Story-Geth binary
 
-```
-wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/geth-public/geth-linux-amd64-0.9.2-ea9f0d2.tar.gz
-tar -xzvf geth-linux-amd64-0.9.2-ea9f0d2.tar.gz
-[ ! -d "$HOME/go/bin" ] && mkdir -p $HOME/go/bin
-if ! grep -q "$HOME/go/bin" $HOME/.bash_profile; then
-  echo 'export PATH=$PATH:$HOME/go/bin' >> $HOME/.bash_profile
-fi
-sudo cp geth-linux-amd64-0.9.2-ea9f0d2/geth $HOME/go/bin/story-geth
-source $HOME/.bash_profile
-story-geth version
-```
-
-
-## Download Story binary
-
-```
-wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.9.11-2a25df1.tar.gz
-tar -xzvf story-linux-amd64-0.9.11-2a25df1.tar.gz
-[ ! -d "$HOME/go/bin" ] && mkdir -p $HOME/go/bin
-if ! grep -q "$HOME/go/bin" $HOME/.bash_profile; then
-  echo 'export PATH=$PATH:$HOME/go/bin' >> $HOME/.bash_profile
-fi
-sudo cp story-linux-amd64-0.9.11-2a25df1/story $HOME/go/bin/story
-source $HOME/.bash_profile
-story version
-```
-
-
-## Initiate Iliad node
+# Initiate Iliad node
 
 Replace "Your_moniker_name" with any name you want 
 (Ex: story init --network iliad --moniker cryptoburo )
@@ -83,7 +42,7 @@ story init --network iliad --moniker "Your_moniker_name"
 ```
 
 
-### Peers setup
+# Peers setup
 ```
 PEERS=$(curl -s -X POST https://rpc-story.josephtran.xyz -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"net_info","params":[],"id":1}' | jq -r '.result.peers[] | select(.connection_status.SendMonitor.Active == true) | "\(.node_info.id)@\(if .node_info.listen_addr | contains("0.0.0.0") then .remote_ip + ":" + (.node_info.listen_addr | sub("tcp://0.0.0.0:"; "")) else .node_info.listen_addr | sub("tcp://"; "") end)"' | tr '\n' ',' | sed 's/,$//' | awk '{print "\"" $0 "\""}')
 
@@ -96,7 +55,7 @@ else
 fi
 ```
 
-## Create story-geth service file
+# Create story-geth service file
 ```
 sudo tee /etc/systemd/system/story-geth.service > /dev/null <<EOF
 [Unit]
@@ -115,7 +74,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-## Create story service file
+# Create story service file
 
 ```
 sudo tee /etc/systemd/system/story.service > /dev/null <<EOF
@@ -135,7 +94,7 @@ WantedBy=multi-user.target
 EOF
 ```
 
-## Reload and start story-geth
+# Reload and start story-geth
 ```
 sudo systemctl daemon-reload && \
 sudo systemctl enable story-geth && \
@@ -149,15 +108,15 @@ sudo systemctl status story-geth
 
 # Check logs
 
-### Geth logs
+## Geth logs
 ```
 sudo journalctl -u story-geth -f -o cat
 ```
-### Story logs
+## Story logs
 ```
 sudo journalctl -u story -f -o cat
 ```
-### Check sync status
+## Check sync status
 
 ```
 curl localhost:26657/status | jq
@@ -173,21 +132,10 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 
 
 
-## Download Sync-Snapshots File : 
+   ## Download And Setup Sync-Snapshots File : 
     
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/sync-snapshots.sh
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/sync-snapshots.sh && chmod +x sync-snapshots.sh && ./sync-snapshots.sh
 
-
-
-## Make the script executable :
-    
-    chmod +x sync-snapshots.sh
-    
-
-## Run the script to update the Story version :
-    
-    ./sync-snapshots.sh
-    
 
 
     
@@ -195,53 +143,31 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 # Upgrade to Story v0.11.1
 
 
-## Download Story v0.11.1 File : 
+   ## Download And Setup Story v0.11.1 File : 
     
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-v0.11.1.sh
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-v0.11.1.sh && chmod +x story-v0.11.1.sh && ./story-v0.11.1.sh
+
     
 
-
-## Make the script executable :
-    
-    chmod +x story-v0.11.0.sh
-    
-
-## Run the script to update the Story version :
-    
-    ./story-v0.11.0.sh
-    
-
-### Ensure your node is running correctly by checking the logs:
-```
-journalctl -u story -f
-```
+   ## Ensure your node is running correctly by checking the logs:
+    ```
+      journalctl -u story -f
+    ```
 
 
 # Upgrade to Story-Geth v0.9.3 version
 
 
-## Download Story-Geth v0.9.3 File : 
+   ## Download Story-Geth v0.9.3 File : 
     
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-geth-v0.9.3.sh
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-geth-v0.9.3.sh && chmod +x story-geth-v0.9.3.sh && ./story-geth-v0.9.3.sh
 
     
-
-## Make the script executable :
-    
-    chmod +x story-geth-v0.9.3.sh
-
-    
-
-## Run the script to update the Story version :
-    
-    ./story-geth-v0.9.3.sh
-    
-    
-
-### Ensure your node is running correctly by checking the logs:
-```
-journalctl -u story -f
-```
+  
+   ## Ensure your node is running correctly by checking the logs:
+    ```
+     journalctl -u story -f
+    ```
 
 
 
