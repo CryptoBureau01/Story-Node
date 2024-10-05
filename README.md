@@ -150,9 +150,9 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
     
 
    ## Ensure your node is running correctly by checking the logs:
-    ```
+    
       journalctl -u story -f
-    ```
+    
 
 
 # Upgrade to Story-Geth v0.9.3 version
@@ -165,9 +165,9 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
     
   
    ## Ensure your node is running correctly by checking the logs:
-    ```
+    
      journalctl -u story -f
-    ```
+    
 
 
 
