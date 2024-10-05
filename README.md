@@ -145,7 +145,7 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 
    ## Download And Setup Story v0.11.1 File : 
     
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-v0.11.1.sh && chmod +x story-v0.11.1.sh && ./story-v0.11.1.sh
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/story-v0.11.0.sh && chmod +x story-v0.11.0.sh && ./story-v0.11.0.sh
 
     
 
