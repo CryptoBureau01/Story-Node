@@ -343,20 +343,24 @@ stake_ip() {
     print_info "You need to have at least 1 IP in your wallet to proceed with staking."
     print_info "Get it from the faucet: https://faucet.story.foundation/"
 
-    # Check sync status (ensure 'catching_up' is false)
-    print_info "Checking the sync status..."
+    while true; do
+        # Check sync status (ensure 'catching_up' is false)
+        print_info "Checking the sync status..."
 
-    SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
+        SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
-    if [ "$SYNC_STATUS" == "true" ]; then
-        print_info "Node is still catching up. Please check the sync status:"
-        print_info "Run the following command to check the sync info:"
-        print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
-        print_info "The sync status is currently catching_up: true, which means staking cannot proceed."
-        exit 1
-    else
-        print_info "Node sync complete. Proceeding to validator registration."
-    fi
+        if [ "$SYNC_STATUS" == "true" ]; then
+            print_info "Node is still catching up. Please check the sync status:"
+            print_info "Run the following command to check the sync info:"
+            print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
+            print_info "The sync status is currently catching_up: true, which means staking cannot proceed."
+            print_info "Returning to the Node Management Menu..."
+            return  # Exit the loop and return to the menu
+        else
+            print_info "Node sync complete. Proceeding to validator registration."
+            break  # Exit the loop if the node is synced
+        fi
+    done
 
     # Ask the user how many IP they want to stake
     read -p "Enter the amount of IP you want to stake (minimum 1 IP): " STAKE_AMOUNT
@@ -384,6 +388,7 @@ stake_ip() {
     # Return to node management menu
     node_management_menu
 }
+
 
 
 remove_node() {
