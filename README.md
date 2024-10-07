@@ -134,7 +134,7 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
 
    ## Download And Setup Sync-Snapshots File : 
     
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/sync-snapshots.sh && chmod +x sync-snapshots.sh && ./sync-snapshots.sh
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/update-snapshots.sh && chmod +x update-snapshots.sh && ./update-snapshots.sh
 
 
 
