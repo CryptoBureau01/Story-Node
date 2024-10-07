@@ -484,6 +484,66 @@ stop_nodes() {
 }
 
 
+# Function to show logs
+show_logs() {
+    print_info "Displaying logs for 'story' service..."
+    
+    # Check if journalctl is installed
+    if ! command -v journalctl &> /dev/null; then
+        print_error "journalctl is not installed. Please install it first."
+        exit 1
+    fi
+    
+    # Show logs for 'story' service
+    journalctl -u story -f cat --lines=100
+
+    print_info "Log display completed. Redirecting to the main menu..."
+    
+     # Return to node management menu
+    node_management_menu
+}
+
+# Function to show logs
+geth_logs() {
+    print_info "Displaying logs for 'story-geth' service..."
+
+    # Check if journalctl is installed
+    if ! command -v journalctl &> /dev/null; then
+        print_error "journalctl is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Show logs for 'story-geth' service
+    sudo journalctl -u story-geth -f -o cat --lines=100
+
+
+    print_info "Log display completed. Redirecting to the main menu..."
+    
+     # Return to node management menu
+    node_management_menu
+}
+
+
+# Function to show logs for 'story' service
+show_story_logs() {
+    print_info "Displaying logs for 'story' service..."
+
+    # Check if journalctl is installed
+    if ! command -v journalctl &> /dev/null; then
+        print_error "journalctl is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Show logs for 'story' service
+    sudo journalctl -u story -f -o cat --lines=100
+
+     print_info "Log display completed. Redirecting to the main menu..."
+     
+     # Return to node management menu
+    node_management_menu
+}
+
+
 
     # Function to display the Node Management Menu
 node_management_menu() {
@@ -497,8 +557,11 @@ node_management_menu() {
         "Update Peers"
         "Update Snapshot"
         "Stake IP"
-        "Start Node"
         "Stop Node"
+        "Start Node"
+        "Story-Logs"
+        "Geth-Logs"
+        "Nodes-Logs"
         "Remove Node"
         "Exit"
     )
@@ -540,18 +603,30 @@ node_management_menu() {
                 stake_ip  # Call the stake IP function
                 ;;
             8)
-                print_info "You selected to start the node."
-                start_nodes  # Call the start node function
-                ;;
-            9)
                 print_info "You selected to stop the node."
                 stop_nodes  # Call the stop node function
                 ;;
+            9)
+               print_info "You selected to start the node."
+                start_nodes  # Call the start node function
+                ;;
             10)
+                print_info "You selected to Nodes Logs."
+                show_logs  # Call the remove node function
+                ;;
+            11)
+                print_info "You selected to Geth Logs."
+                geth_logs  # Call the remove node function
+                ;;
+            12)
+                print_info "You selected to Story Logs."
+                show_story_logs  # Call the remove node function
+                ;;
+            13)
                 print_info "You selected to remove the node."
                 remove_node  # Call the remove node function
                 ;;
-            11)
+            14)
                 print_info "Exiting the script."
                 break
                 ;;
