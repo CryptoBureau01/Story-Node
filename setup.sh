@@ -66,21 +66,25 @@ install_dependencies() {
         dpkg --compare-versions "$1" ge "$2"
     }
 
-   # Check for required Python packages
-    echo "[INFO] Checking for required Python packages..."
-    
-    # Check if python3-apt is installed
+   # Check if python3-apt is installed
     if ! python3 -c "import apt_pkg" &>/dev/null; then
         print_info "python3-apt is not installed. Installing..."
         sudo apt-get update
-        sudo apt-get install -y python3-apt
-        
-        # Check if installation was successful
-        if python3 -c "import apt_pkg" &>/dev/null; then
+
+        # Attempt to install python3-apt
+        if sudo apt-get install -y python3-apt; then
             print_info "python3-apt installed successfully."
         else
-            print_error "Failed to install python3-apt. Please install it manually."
-            exit 1
+            print_error "Failed to install python3-apt. Attempting to resolve..."
+            # Fallback approach: Ensure all dependencies are installed
+            sudo apt-get install -y python3 python3-pip python3-dev
+            # Retry installing python3-apt
+            if sudo apt-get install -y python3-apt; then
+                print_info "python3-apt installed successfully after fallback."
+            else
+                print_error "Failed to install python3-apt. Please install it manually."
+                exit 1
+            fi
         fi
     else
         print_info "python3-apt is already installed."
