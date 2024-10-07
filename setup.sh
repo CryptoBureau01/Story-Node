@@ -21,6 +21,28 @@ ensure_go_path() {
     source "$HOME/.bash_profile"
 }
 
+# Function to install Go
+install_go() {
+    local required_version="$1"
+    print_info "Installing Go version $required_version..."
+
+    # Download Go binary
+    wget "https://golang.org/dl/go${required_version}.linux-amd64.tar.gz" -O /tmp/go.tar.gz
+
+    # Remove any existing Go installation
+    sudo rm -rf /usr/local/go
+
+    # Extract and install Go
+    sudo tar -C /usr/local -xzf /tmp/go.tar.gz
+
+    # Cleanup
+    rm /tmp/go.tar.gz
+
+    print_info "Go version $required_version installed successfully."
+}
+
+
+
 # Function to install dependencies
 install_dependencies() {
     print_info "<================= Install dependencies ===============>"
@@ -44,6 +66,27 @@ install_dependencies() {
         dpkg --compare-versions "$1" ge "$2"
     }
 
+   # Check for required Python packages
+    echo "[INFO] Checking for required Python packages..."
+    
+    # Check if python3-apt is installed
+    if ! python3 -c "import apt_pkg" &>/dev/null; then
+        print_info "python3-apt is not installed. Installing..."
+        sudo apt-get update
+        sudo apt-get install -y python3-apt
+        
+        # Check if installation was successful
+        if python3 -c "import apt_pkg" &>/dev/null; then
+            print_info "python3-apt installed successfully."
+        else
+            print_error "Failed to install python3-apt. Please install it manually."
+            exit 1
+        fi
+    else
+        print_info "python3-apt is already installed."
+    fi
+
+    
     # Required Go version
     required_version="1.22.0"
 
