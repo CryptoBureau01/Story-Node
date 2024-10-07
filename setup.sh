@@ -353,9 +353,16 @@ stake_ip() {
             print_info "Node is still catching up. Please check the sync status:"
             print_info "Run the following command to check the sync info:"
             print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
-            print_info "The sync status is currently catching_up: true, which means staking cannot proceed."
-            print_info "Returning to the Node Management Menu..."
-            return  # Exit the loop and return to the menu
+            print_info "The sync status is currently catching_up: true."
+
+            # Ask user if they want to check again or return to the menu
+            read -p "Do you want to check the sync status again? (y/n): " user_choice
+            if [[ "$user_choice" =~ ^[Yy]$ ]]; then
+                continue  # Check the sync status again
+            else
+                print_info "Returning to the Node Management Menu..."
+                return  # Exit the function and return to the menu
+            fi
         else
             print_info "Node sync complete. Proceeding to validator registration."
             break  # Exit the loop if the node is synced
