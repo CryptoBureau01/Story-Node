@@ -349,7 +349,7 @@ stake_ip() {
 
         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
-        if [ "$SYNC_STATUS" == "true" ]; then
+        if [ "$SYNC_STATUS" == "false" ]; then
             print_info "Node is still catching up. Please check the sync status:"
             print_info "Run the following command to check the sync info:"
             print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
