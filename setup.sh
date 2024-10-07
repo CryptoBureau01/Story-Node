@@ -1,15 +1,17 @@
 #!/bin/bash
 
+# Function to print info messages
+print_info() {
+    echo -e "\e[32m[INFO] $1\e[0m"
+}
 
 # Function to print error messages
 print_error() {
-    echo "[ERROR] $1"
+    echo -e "\e[31m[ERROR] $1\e[0m"
 }
 
-# Function to print info messages
-print_info() {
-    echo "[INFO] $1"
-}
+
+
 
 # Function to ensure go/bin is in PATH
 ensure_go_path() {
