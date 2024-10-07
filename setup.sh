@@ -41,7 +41,10 @@ install_go() {
     print_info "Go version $required_version installed successfully."
 }
 
-
+# Function to compare versions
+version_ge() { 
+    dpkg --compare-versions "$1" ge "$2"
+}
 
 # Function to install dependencies
 install_dependencies() {
@@ -61,12 +64,13 @@ install_dependencies() {
         exit 1; 
     }
 
-    # Function to compare versions
-    version_ge() { 
-        dpkg --compare-versions "$1" ge "$2"
-    }
+    # Check Python version
+    python_version=$(python3 --version 2>&1 | awk '{print $2}')
+    major_version=$(echo "$python_version" | cut -d. -f1)
+    minor_version=$(echo "$python_version" | cut -d. -f2)
+    version_check=$(python3 -c "import sys; print(sys.version_info >= (3, 12))")
 
-   # Check if python3-apt is installed
+    # Check if python3-apt is installed
     if ! python3 -c "import apt_pkg" &>/dev/null; then
         if [ "$version_check" = "False" ]; then
             print_info "Python version $python_version is below 3.12. Attempting to update Python..."
@@ -84,7 +88,9 @@ install_dependencies() {
             exit 1
         fi
     else
-    
+        print_info "python3-apt is already installed."
+    fi
+
     # Required Go version
     required_version="1.22.0"
 
@@ -103,20 +109,7 @@ install_dependencies() {
         install_go "$required_version"
     fi
 
-
-
     # Ensure go/bin directory exists
-    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
-
-    # Add go/bin to PATH if not already added
-    if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
-        echo "export PATH=\$PATH:\$HOME/go/bin" >> "$HOME/.bash_profile"
-    fi
-
-    # Source the .bash_profile to update the current session
-    source "$HOME/.bash_profile"
-
-    # Ensure go/bin is in PATH
     ensure_go_path
 
     # Display the Go version to confirm the installation
@@ -125,7 +118,6 @@ install_dependencies() {
     # Return to node management menu
     node_management_menu
 }
-
 
 
 # Function to setup Story-Geth Binary
