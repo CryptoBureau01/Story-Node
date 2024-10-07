@@ -21,13 +21,15 @@ print_error() {
     echo -e "\e[31m[ERROR] $1\e[0m"
 }
 
+
+print_info "<=================Install dependencies===============>"
+
+
 # Install dependencies
 echo "Updating package lists and installing dependencies..."
 sudo apt update
 sudo apt-get update
 sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y
-
-print_info "<===========================Check Go Version =============================>"
 
 # Function to compare versions
 version_ge() { 
@@ -86,7 +88,7 @@ source $HOME/.bash_profile
 go version
 
 
-print_info "<===========================Story-Geth Binary Setup=============================>"
+print_info "<=================Story-Geth Binary Setup===============>"
 
 # Ensure go/bin directory exists
 [ ! -d "$HOME/go/bin" ] && mkdir -p $HOME/go/bin
@@ -143,7 +145,7 @@ print_info "Story-Geth has been successfully updated to version 0.9.3!"
 
 
 
-print_info "<===========================Story Binary Setup=============================>"
+print_info "<=================Story Binary Setup===============>"
 
 
 # Ensure go/bin directory exists
@@ -201,7 +203,7 @@ print_info "Story has been successfully updated to version 0.10.1!"
 
 
 
-print_info "<===========================Setup Moniker Name=============================>"
+print_info "<=================Setup Moniker Name===============>"
 
 
 # Please Typer Your Moniker Name.....
@@ -218,7 +220,7 @@ fi
 
 
 
-print_info "<===========================Setup Peers=============================>"
+print_info "<=================Setup Peers===============>"
 
 
 # Get active peers from the RPC server
@@ -277,10 +279,10 @@ sudo systemctl enable story-geth
 sudo systemctl start story
 sudo systemctl enable story
 
+print_info "Successfully Peers Restart!"
 
 
-
-print_info "<===========================SYNC using snapshot File=============================>"
+print_info "<=================Update Snapshot===============>"
 
 print_info "Applying Mandragora snapshots (story client + story-geth)..."
 
@@ -294,11 +296,75 @@ print_info "Snapshots applied successfully!"
 
 
 
-print_info "<===========================SYNC using snapshot File=============================>"
+print_info "<=================Stake IP===============>"
+
+
+# Path to the private key (automatically imported from file)
+PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
+
+# Inform the user about the requirement to have at least 1 IP in their wallet
+print_info "You need to have at least 1 IP in your wallet to proceed with staking."
+print_info "Get it from the faucet: https://faucet.story.foundation/"
+
+# Check sync status (ensure 'catching_up' is false)
+print_info "Checking the sync status..."
+
+SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
+
+if [ "$SYNC_STATUS" == "false" ]; then
+    print_info "Node is still catching up. Please check the sync status:"
+    print_info "Run the following command to check the sync info:"
+    print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
+    print_info "The sync status is currently catching_up: false, which means staking cannot proceed."
+    exit 1
+else
+    print_info "Node sync complete. Proceeding to validator registration."
+fi
+
+# Ask the user how many IP they want to stake
+read -p "Enter the amount of IP you want to stake (minimum 1 IP): " STAKE_AMOUNT
+
+# Validate input (minimum stake must be 1)
+if [ "$STAKE_AMOUNT" -lt 1 ]; then
+    print_info "The stake amount must be at least 1 IP. Exiting."
+    exit 1
+fi
+
+# Convert stake amount to the required format (multiply by 10^18)
+STAKE_WEI=$(echo "$STAKE_AMOUNT * 1000000000000000000" | bc)
+
+# Register the validator using the imported private key
+story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
+
+# Wait for 5 minutes (300 seconds) before proceeding
+print_info "Waiting for 5 minutes for the changes to reflect..."
+sleep 300
+
+# Inform the user where they can check their validator
+print_info "You can check your validator's status and stake on the following explorer:"
+print_info "Explorer: https://testnet.story.explorers.guru/"
 
 
 
-print_info "Setup completed!"
+print_info "<=================Remove Node===============>"
 
+# Node removal section
+read -p "Are you sure you want to remove the node? Type 'Yes' to confirm or 'No' to cancel: " confirmation
+if [[ "$confirmation" == "Yes" ]]; then
+    print_info "Removing Node..."
+    sudo systemctl stop story-geth
+    sudo systemctl stop story
+    sudo systemctl disable story-geth
+    sudo systemctl disable story
+    sudo rm /etc/systemd/system/story-geth.service
+    sudo rm /etc/systemd/system/story.service
+    sudo systemctl daemon-reload
+    sudo rm -rf $HOME/.story
+    sudo rm $HOME/go/bin/story-geth
+    sudo rm $HOME/go/bin/story
+    print_info "Node successfully removed!"
+else
+    print_info "Node removal canceled."
+fi
 
 
