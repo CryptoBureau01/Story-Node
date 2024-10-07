@@ -397,15 +397,32 @@ remove_node() {
 
 
 
+# Function to start nodes
+start_nodes() {
+    print_info "<================= Start Nodes ================>"
+    print_info "Starting Story and Story Geth services..."
+    sudo systemctl start story-geth.service
+    sudo systemctl start story.service
+    print_info "Story and Story Geth services started."
+    node_management_menu
+}
+
+# Function to stop nodes
+stop_nodes() {
+    print_info "<================= Stop Nodes ================>"
+    print_info "Stopping Story and Story Geth services..."
+    sudo systemctl stop story-geth.service
+    sudo systemctl stop story.service
+    print_info "Story and Story Geth services stopped."
+    node_management_menu
+}
 
 
-#!/bin/bash
 
-# Function to display the Node Management Menu
+    # Function to display the Node Management Menu
 node_management_menu() {
     print_info "<================= Node Management Menu ===============>"
-
-    PS3="Please select an option: "
+    
     options=(
         "Install dependencies"
         "Story-Geth Binary Setup"
@@ -414,49 +431,66 @@ node_management_menu() {
         "Update Peers"
         "Update Snapshot"
         "Stake IP"
+        "Start Node"
+        "Stop Node"
         "Remove Node"
         "Exit"
     )
-    select opt in "${options[@]}"; do
-        case $opt in
-            "Install dependencies")
+
+    # Display options with numbers
+    for i in "${!options[@]}"; do
+        echo "$((i + 1)). ${options[$i]}"
+    done
+
+    while true; do
+        read -p "Please select an option (1-11): " choice
+        case $choice in
+            1)
                 print_info "You selected to install dependencies."
                 install_dependencies  # Call the function here
                 ;;
-            "Story-Geth Binary Setup")
+            2)
                 print_info "You selected Story-Geth Binary Setup."
                 setup_story_geth  # Call the Story-Geth setup function
                 ;;
-            "Story Binary Setup")
+            3)
                 print_info "You selected Story Binary Setup."
                 setup_story_binary  # Call the Story binary setup function
                 ;;
-            "Setup Moniker Name")
+            4)
                 print_info "You selected to setup Moniker Name."
                 setup_moniker_name  # Call the setup moniker function
                 ;;
-            "Update Peers")
+            5)
                 print_info "You selected to update peers."
                 update_peers  # Call the update peers function
                 ;;
-            "Update Snapshot")
+            6)
                 print_info "You selected to update snapshot."
                 update_snapshot  # Call the update snapshot function
                 ;;
-            "Stake IP")
+            7)
                 print_info "You selected to stake IP."
-                stake_ip  # Call the update snapshot function
+                stake_ip  # Call the stake IP function
                 ;;
-            "Remove Node")
+            8)
+                print_info "You selected to start the node."
+                start_nodes  # Call the start node function
+                ;;
+            9)
+                print_info "You selected to stop the node."
+                stop_nodes  # Call the stop node function
+                ;;
+            10)
                 print_info "You selected to remove the node."
-                remove_node # Call the remove node function
+                remove_node  # Call the remove node function
                 ;;
-            "Exit")
+            11)
                 print_info "Exiting the script."
                 break
                 ;;
-            *) 
-                print_info "Invalid option, please try again." 
+            *)
+                print_info "Invalid option, please select a number between 1 and 11." 
                 ;;
         esac
     done
