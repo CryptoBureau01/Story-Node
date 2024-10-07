@@ -68,43 +68,15 @@ install_dependencies() {
 
    # Check if python3-apt is installed
     if ! python3 -c "import apt_pkg" &>/dev/null; then
-        print_info "python3-apt is not installed. Attempting to fix installation..."
-        sudo apt-get update
-        
-        # Attempt to fix issues with command-not-found and python3-apt
-        sudo apt remove -y command-not-found
-        sudo apt install -y python3-apt
-        sudo apt install -y command-not-found
-        
-        # Cleanup apt cache
-        sudo rm -rf /var/lib/apt/lists/*
-        sudo rm -rf /var/cache/apt/archives/*
-        sudo apt --fix-broken install
-        sudo update-command-not-found
+        if [ "$version_check" = "False" ]; then
+            print_info "Python version $python_version is below 3.12. Attempting to update Python..."
+            sudo apt-get update
+            sudo apt-get install -y python3 python3-pip
+        fi
 
-        # Update the configuration for command-not-found
-        config_file="/etc/apt/apt.conf.d/50command-not-found"
-        sudo bash -c "cat > $config_file << EOF
-## This file is provided by command-not-found(1) to download
-## Commands metadata files.
-
-Acquire::IndexTargets {
-    # The deb822 metadata files
-    deb::CNF  {
-        MetaKey \"\$(COMPONENT)/cnf/Commands-\$(NATIVE_ARCHITECTURE)\";
-        ShortDescription \"Commands-\$(NATIVE_ARCHITECTURE)\";
-        Description \"\$(RELEASE)/\$(COMPONENT) \$(NATIVE_ARCHITECTURE) c-n-f Metadata\";
-    };
-};
-
-# Refresh AppStream cache when APT's cache is updated (i.e. apt update)
-#APT::Update::Post-Invoke-Success { 
-#   \"if /usr/bin/test -w /var/lib/command-not-found/ -a -e /usr/lib/cnf-update-db; then /usr/lib/cnf-update-db > /dev/null; fi\"; 
-# };
-EOF"
-
-        # Check if installation was successful
-        if python3 -c "import apt_pkg" &>/dev/null; then
+        # Now try installing python3-apt
+        print_info "Attempting to install python3-apt..."
+        if sudo apt-get install -y python3-apt; then
             print_info "python3-apt installed successfully."
         else
             print_error "Failed to install python3-apt. Please check your system and try again."
@@ -112,8 +84,6 @@ EOF"
             exit 1
         fi
     else
-        print_info "python3-apt is already installed."
-    fi
     
     # Required Go version
     required_version="1.22.0"
