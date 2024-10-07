@@ -13,7 +13,7 @@ print_error() {
 
 
 # Function to ensure go/bin is in PATH
-go_path() {
+ensure_go_path() {
     [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
     if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
         echo "export PATH=\$PATH:\$HOME/go/bin" >> "$HOME/.bash_profile"
@@ -25,11 +25,13 @@ go_path() {
 install_dependencies() {
     print_info "<================= Install dependencies ===============>"
     print_info "Starting Install Dependencies..."
-    
-    # Install general dependencies
+
+    # Update package lists and install general dependencies
     echo "Updating package lists and installing dependencies..."
-    sudo apt update && sudo apt-get update
-    sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y
+    if ! sudo apt update && sudo apt-get upgrade -y && sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y; then
+        print_error "Failed to install dependencies. Please check the logs."
+        exit 1
+    fi
 
     # Check if curl is installed
     command -v curl >/dev/null 2>&1 || { 
@@ -72,9 +74,8 @@ install_dependencies() {
     source "$HOME/.bash_profile"
 
     # Ensure go/bin is in PATH
-    go_path
+    ensure_go_path
 
-    
     # Display the Go version to confirm the installation
     go version
     
@@ -83,16 +84,21 @@ install_dependencies() {
 }
 
 
+
 # Function to setup Story-Geth Binary
 setup_story_geth() {
     print_info "<================= Story-Geth Binary Setup ===============>"
 
     # Ensure go/bin directory exists
-    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
+    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin" || {
+        print_error "Failed to create directory $HOME/go/bin"
+        exit 1
+    }
 
     # Add go/bin to PATH if not already added
     if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
         echo 'export PATH=$PATH:$HOME/go/bin' >> "$HOME/.bash_profile"
+        print_info "$HOME/go/bin has been added to PATH."
     fi
 
     # Source the .bash_profile to update the current session
@@ -105,6 +111,7 @@ setup_story_geth() {
         print_error "Failed to download Story-Geth binary"
         exit 1
     fi
+    print_info "Successfully downloaded Story-Geth binary."
 
     # Extract Story-Geth v0.9.3 binary
     print_info "Extracting Story-Geth v0.9.3..."
@@ -112,24 +119,25 @@ setup_story_geth() {
         print_error "Failed to extract Story-Geth binary"
         exit 1
     fi
+    print_info "Successfully extracted Story-Geth binary."
 
     # Move Story-Geth binary to go/bin and make it executable
     print_info "Moving Story-Geth binary to go/bin..."
-    if ! sudo mv geth-linux-amd64-0.9.3-b224fdf/geth "$HOME/go/bin/story-geth"; then
+    if ! mv geth-linux-amd64-0.9.3-b224fdf/geth "$HOME/go/bin/story-geth"; then
         print_error "Failed to move Story-Geth binary"
         exit 1
     fi
 
     # Make the binary executable
     print_info "Making the binary executable..."
-    if ! sudo chmod +x "$HOME/go/bin/story-geth"; then
+    if ! chmod +x "$HOME/go/bin/story-geth"; then
         print_error "Failed to make the binary executable"
         exit 1
     fi
 
     # Check the Story-Geth version to confirm the update
     print_info "Checking the Story-Geth version..."
-    if ! story-geth version; then
+    if ! "$HOME/go/bin/story-geth" version; then
         print_error "Failed to check Story-Geth version"
         exit 1
     fi
@@ -151,11 +159,17 @@ setup_story_binary() {
     print_info "<================= Story Binary Setup ================>"
 
     # Ensure go/bin directory exists
-    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
+    if [ ! -d "$HOME/go/bin" ]; then
+        mkdir -p "$HOME/go/bin" || {
+            print_error "Failed to create directory $HOME/go/bin"
+            exit 1
+        }
+    fi
 
     # Add go/bin to PATH if not already added
     if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
         echo "export PATH=\$PATH:\$HOME/go/bin" >> "$HOME/.bash_profile"
+        print_info "$HOME/go/bin has been added to PATH."
     fi
 
     # Source the .bash_profile to update the current session
@@ -168,6 +182,7 @@ setup_story_binary() {
         print_error "Failed to download Story binary"
         exit 1
     fi
+    print_info "Successfully downloaded Story binary."
 
     # Extract Story v0.10.1 binary
     print_info "Extracting Story v0.10.1..."
@@ -175,24 +190,25 @@ setup_story_binary() {
         print_error "Failed to extract Story binary"
         exit 1
     fi
+    print_info "Successfully extracted Story binary."
 
     # Move Story binary to go/bin and make it executable
     print_info "Moving Story binary to go/bin..."
-    if ! sudo mv story-linux-amd64-0.10.1-57567e5/story "$HOME/go/bin/story"; then
+    if ! mv story-linux-amd64-0.10.1-57567e5/story "$HOME/go/bin/story"; then
         print_error "Failed to move Story binary"
         exit 1
     fi
 
     # Make the binary executable
     print_info "Making the binary executable..."
-    if ! sudo chmod +x "$HOME/go/bin/story"; then
+    if ! chmod +x "$HOME/go/bin/story"; then
         print_error "Failed to make the binary executable"
         exit 1
     fi
 
     # Check the Story version to confirm the update
     print_info "Checking the Story version..."
-    if ! story version; then
+    if ! "$HOME/go/bin/story" version; then
         print_error "Failed to check Story version"
         exit 1
     fi
@@ -206,6 +222,7 @@ setup_story_binary() {
     # Return to node management menu
     node_management_menu
 }
+
 
 
 
