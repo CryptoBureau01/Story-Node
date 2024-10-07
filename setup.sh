@@ -124,10 +124,13 @@ setup_story_geth() {
     print_info "<================= Story-Geth Binary Setup ===============>"
 
     # Ensure go/bin directory exists
-    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin" || {
-        print_error "Failed to create directory $HOME/go/bin"
-        exit 1
-    }
+    if [ ! -d "$HOME/go/bin" ]; then
+           if ! mkdir -p "$HOME/go/bin"; then
+              print_error "Failed to create directory $HOME/go/bin"
+              exit 1
+           fi
+    fi
+
 
     # Add go/bin to PATH if not already added
     if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
