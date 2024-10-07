@@ -27,6 +27,7 @@ print_info "Stopping the Story and Story-Geth services..."
 sudo systemctl stop story
 sudo systemctl stop story-geth
 
+
 # Backup priv_validator_state.json
 print_info "Backing up priv_validator_state.json..."
 if ! sudo cp $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv_validator_state.json.backup; then
@@ -34,24 +35,32 @@ if ! sudo cp $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv
     exit 1
 fi
 
+
+# Delete previous chaindata and story data folders
+print_info "Deleting previous data..."
+sudo rm -rf $HOME/.story/geth/iliad/geth/chaindata
+sudo rm -rf $HOME/.story/story/data
+
+
 # Check and delete the old Geth snapshot if it exists
-if [ -f "$HOME/Geth_snapshot.lz4" ]; then
-    print_info "Old Geth snapshot found. Deleting..."
-    rm "$HOME/Geth_snapshot.lz4"
+if [ -f "$HOME/geth_snapshot.lz4" ]; then
+    print_info "Old geth snapshot found. Deleting..."
+    rm "$HOME/geth_snapshot.lz4"
 fi
 
 # Download the new Geth snapshot
 print_info "Downloading the Geth snapshot..."
 cd $HOME
-if ! wget -O Geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
-    print_error "Failed to download Geth snapshot"
+if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
+    print_error "Failed to download geth snapshot"
     exit 1
 fi
 
+
 # Check and delete the old Story snapshot if it exists
-if [ -f "$HOME/Story_snapshot.lz4" ]; then
+if [ -f "$HOME/story_snapshot.lz4" ]; then
     print_info "Old Story snapshot found. Deleting..."
-    rm "$HOME/Story_snapshot.lz4"
+    rm "$HOME/story_snapshot.lz4"
 fi
 
 # Download the new Story snapshot
@@ -63,7 +72,7 @@ fi
 
 # Unzip Geth snapshot
 print_info "Extracting Geth snapshot..."
-if ! lz4 -c -d Geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth; then
+if ! lz4 -c -d geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth; then
     print_error "Failed to extract Geth snapshot"
     exit 1
 fi
@@ -82,15 +91,12 @@ if ! sudo cp $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/da
     exit 1
 fi
 
-# Restart Story and Story-Geth services
-print_info "Restarting the Story and Story-Geth services..."
-sudo systemctl start story
-sudo systemctl start story-geth
 
 # Check if the services have started successfully
 print_info "Checking Story and Story-Geth status..."
 sudo systemctl status story
 sudo systemctl status story-geth
+
 
 # Final success message
 print_info "Congratulations, Sync Snapshot completed!"
