@@ -1,16 +1,15 @@
 #!/bin/bash
 
 
-# Print information function
-print_info() {
-    echo -e "\e[32m[INFO] $1\e[0m"
-}
-
-# Print error function
+# Function to print error messages
 print_error() {
-    echo -e "\e[31m[ERROR] $1\e[0m"
+    echo "[ERROR] $1"
 }
 
+# Function to print info messages
+print_info() {
+    echo "[INFO] $1"
+}
 
 # Function to ensure go/bin is in PATH
 ensure_go_path() {
@@ -66,8 +65,6 @@ install_dependencies() {
 
     # Check Python version
     python_version=$(python3 --version 2>&1 | awk '{print $2}')
-    major_version=$(echo "$python_version" | cut -d. -f1)
-    minor_version=$(echo "$python_version" | cut -d. -f2)
     version_check=$(python3 -c "import sys; print(sys.version_info >= (3, 12))")
 
     # Check if python3-apt is installed
