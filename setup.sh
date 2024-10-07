@@ -495,7 +495,7 @@ show_logs() {
     fi
     
     # Show logs for 'story' service
-    journalctl -u story -f cat --lines=100
+    journalctl -u story -f --lines=100
 
     print_info "Log display completed. Redirecting to the main menu..."
     
@@ -514,7 +514,7 @@ geth_logs() {
     fi
 
     # Show logs for 'story-geth' service
-    sudo journalctl -u story-geth -f -o cat --lines=100
+    sudo journalctl -u story-geth -f -o --lines=100
 
 
     print_info "Log display completed. Redirecting to the main menu..."
@@ -535,7 +535,7 @@ show_story_logs() {
     fi
 
     # Show logs for 'story' service
-    sudo journalctl -u story -f -o cat --lines=100
+    sudo journalctl -u story -f -o --lines=100
 
      print_info "Log display completed. Redirecting to the main menu..."
      
