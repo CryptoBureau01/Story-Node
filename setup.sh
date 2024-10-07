@@ -1,16 +1,6 @@
 #!/bin/bash
 
 
-# Function to print info messages
-print_info() {
-    echo "[INFO] $1"
-}
-
-# Function to print error messages
-print_error() {
-    echo "[ERROR] $1"
-}
-
 # Print information function
 print_info() {
     echo -e "\e[32m[INFO] $1\e[0m"
@@ -22,7 +12,14 @@ print_error() {
 }
 
 
-
+# Function to ensure go/bin is in PATH
+go_path() {
+    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
+    if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
+        echo "export PATH=\$PATH:\$HOME/go/bin" >> "$HOME/.bash_profile"
+    fi
+    source "$HOME/.bash_profile"
+}
 
 # Function to install dependencies
 install_dependencies() {
@@ -74,6 +71,10 @@ install_dependencies() {
     # Source the .bash_profile to update the current session
     source "$HOME/.bash_profile"
 
+    # Ensure go/bin is in PATH
+    go_path
+
+    
     # Display the Go version to confirm the installation
     go version
     
