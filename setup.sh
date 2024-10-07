@@ -31,13 +31,17 @@ install_dependencies() {
     
     # Install general dependencies
     echo "Updating package lists and installing dependencies..."
-    sudo apt update
-    sudo apt-get update
+    sudo apt update && sudo apt-get update
     sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y
+
+    # Check if curl is installed
+    command -v curl >/dev/null 2>&1 || { 
+        print_error "curl is not installed. Please install it first."; 
+        exit 1; 
+    }
 
     # Function to compare versions
     version_ge() { 
-        # Check if version1 >= version2
         dpkg --compare-versions "$1" ge "$2"
     }
 
@@ -46,7 +50,6 @@ install_dependencies() {
 
     # Check if Go is installed
     if command -v go &> /dev/null; then
-        # Check Go version
         installed_version=$(go version | awk '{print $3}' | sed 's/go//')
 
         if version_ge "$installed_version" "$required_version"; then
@@ -60,10 +63,12 @@ install_dependencies() {
         install_go "$required_version"
     fi
 
-    # Add Go binary to PATH
-    echo "Setting up Go paths..."
-    if ! grep -q "/usr/local/go/bin" "$HOME/.bash_profile"; then
-        echo "export PATH=\$PATH:/usr/local/go/bin:\$HOME/go/bin" >> "$HOME/.bash_profile"
+    # Ensure go/bin directory exists
+    [ ! -d "$HOME/go/bin" ] && mkdir -p "$HOME/go/bin"
+
+    # Add go/bin to PATH if not already added
+    if ! grep -q "$HOME/go/bin" "$HOME/.bash_profile"; then
+        echo "export PATH=\$PATH:\$HOME/go/bin" >> "$HOME/.bash_profile"
     fi
 
     # Source the .bash_profile to update the current session
@@ -74,21 +79,6 @@ install_dependencies() {
     
     # Return to node management menu
     node_management_menu
-}
-
-
-
-# Function to install Go
-install_go() {
-    local version="$1"
-    echo "Installing Go version $version..."
-    cd "$HOME" || exit 1
-    wget "https://golang.org/dl/go$version.linux-amd64.tar.gz"
-    sudo rm -rf /usr/local/go
-    sudo tar -C /usr/local -xzf "go$version.linux-amd64.tar.gz"
-    rm "go$version.linux-amd64.tar.gz"
-
-    print_info "Go version $version successfully installed."
 }
 
 
