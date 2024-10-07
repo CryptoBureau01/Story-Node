@@ -278,6 +278,26 @@ sudo systemctl start story
 sudo systemctl enable story
 
 
+
+
+print_info "<===========================SYNC using snapshot File=============================>"
+
+print_info "Applying Mandragora snapshots (story client + story-geth)..."
+
+print_info "Check the height of the snapshot (v0.10.1): Block Number -> 1016207"
+
+print_info "Download and setup sync-snapshots file..."
+cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/update-snapshots.sh && chmod +x update-snapshots.sh && ./update-snapshots.sh
+
+print_info "Snapshots applied successfully!"
+
+
+
+
+print_info "<===========================SYNC using snapshot File=============================>"
+
+
+
 print_info "Setup completed!"
 
 
