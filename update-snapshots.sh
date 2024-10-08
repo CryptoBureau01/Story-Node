@@ -9,6 +9,18 @@ print_error() {
     echo -e "\033[1;31m$1\033[0m"
 }
 
+# Function to get user confirmation before deletion
+confirm_deletion() {
+    while true; do
+        read -p "Are you sure you want to delete previous data? (y/n): " choice
+        case "$choice" in
+            [Yy]* ) return 0;;  # If user presses y/Y, return success
+            [Nn]* ) return 1;;  # If user presses n/N, return failure
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+}
+
 # Ensure the script is run as root
 if [ "$EUID" -ne 0 ]; then
     print_error "Please run as root"
@@ -47,6 +59,14 @@ fi
 
 # Ask the user which snapshot to install
 print_info "Which snapshot would you like to install?"
+read -p "Please enter your choice (1: Geth Snapshot, 2: Story Snapshot, 3: Exit): " snapshot_choice
+
+# Check user input and exit if invalid
+if [ "$snapshot_choice" != "1" ] && [ "$snapshot_choice" != "2" ] && [ "$snapshot_choice" != "3" ]; then
+    print_error "Invalid choice. Please run the script again and select 1, 2, or 3."
+    exit 1
+fi
+
 case $snapshot_choice in
     1)
         print_info "You selected Geth Snapshot."
@@ -61,22 +81,19 @@ case $snapshot_choice in
         exit 0   # Exits the script
         ;;
     *)
-        print_info "Invalid option, please select a number between 1 and 3." 
+        print_info "Invalid option, please select a number between 1 and 3."
         ;;
 esac
 
-read -p "Please enter your choice (1 or 2 or 3): " snapshot_choice
-
-# Check user input and exit if invalid
-if [ "$snapshot_choice" != "1" ] && [ "$snapshot_choice" != "2" ]; then
-    print_error "Invalid choice. Please run the script again and select 1 or 2."
-    exit 1
+# Ask for confirmation before deleting the previous data
+if confirm_deletion; then
+    print_info "Deleting previous data..."
+    sudo rm -rf $HOME/.story/geth/iliad/geth/chaindata
+    sudo rm -rf $HOME/.story/story/data
+else
+    print_info "Data deletion aborted by user. Exiting script."
+    exit 0
 fi
-
-# Delete previous chaindata and story data folders
-print_info "Deleting previous data..."
-sudo rm -rf $HOME/.story/geth/iliad/geth/chaindata
-sudo rm -rf $HOME/.story/story/data
 
 if [ "$snapshot_choice" == "1" ]; then
     # Geth Snapshot Installation Process
@@ -149,7 +166,7 @@ if [ -f "$backup_path" ]; then
     if sudo cp "$backup_path" "$private_key_path"; then
         print_info "Restore completed successfully. priv_validator_state.json restored."
     else
-        print_info "Failed to restore priv_validator_state.json."
+        print_error "Failed to restore priv_validator_state.json."
     fi
 else
     print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
