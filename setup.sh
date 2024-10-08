@@ -428,24 +428,9 @@ stake_ip() {
     # Convert stake amount to Wei (1 IP = 10^18 Wei)
     STAKE_WEI=$(awk "BEGIN {printf \"%d\", $STAKE_AMOUNT * 1000000000000000000}")  # Ensure integer output
 
-    # Debugging: Print the stake amount and stake in Wei
-    print_info "Stake Amount: $STAKE_AMOUNT IP"
-    print_info "Stake Amount in Wei: $STAKE_WEI"
-
-    # Check if the stake amount is valid
-    if [[ -z "$STAKE_WEI" || "$STAKE_WEI" -le 0 ]]; then
-        print_info "Invalid stake amount after conversion. Please check your input."
-        exit 1
-    fi
 
     # Register the validator using the imported private key
-    OUTPUT=$(story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY" 2>&1)  # Capture output
-
-    # Check if there was an error in the command execution
-    if [[ $? -ne 0 ]]; then
-        print_info "Error occurred while staking: $OUTPUT"
-        return  # Exit the function on error
-    fi
+    story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
 
     # Wait for 2 minutes (120 seconds) before proceeding
     print_info "Waiting for 2 minutes for the changes to reflect..."
