@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # Read the private key without adding any spaces or formatting
 PRIVATE_KEY=$(cat /root/.story/story/config/private_key.txt | sed 's/PRIVATE_KEY=//')
 
