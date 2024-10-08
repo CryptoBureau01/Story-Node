@@ -685,7 +685,7 @@ node_management_menu() {
     done
 
     while true; do
-        read -p "Please select an option (1-11): " choice
+        read -p "Please select an option (1-16): " choice
         case $choice in
             1)
                 print_info "You selected to install dependencies."
@@ -712,36 +712,36 @@ node_management_menu() {
                 update_snapshot  # Call the update snapshot function
                 ;;
             7)
-                print_info "You selected to stake IP."
-                stake_ip  # Call the stake IP function
-                ;;
-            8)
-                print_info "You selected to unstake IP."
-                unstake_ip  # Call the unstake IP function
-                ;;
-            9)
                 print_info "You selected to stop the node."
                 stop_nodes  # Call the stop node function
                 ;;
-            10)
+            8)
                print_info "You selected to start the node."
                 start_nodes  # Call the start node function
                 ;;
-            11)
+            9)
                 print_info "Starting the node status check..."
                 check_node_status # Call the Node Status function
                 ;;
-            12)
+            10)
                 print_info "Check Your Validator Info"
                 show_validator_info  # Call the Validator Info function
                 ;;
-            13)
+            11)
                 print_info "Check Your Private Key."
                 check_private_key  # Call the Private Key Checker function
                 ;;
-            14)
+            12)
                 print_info "Check Your Account Balance Check!."
                 check_balance  # Call the Account Balance Checker function
+                ;;
+            13)
+                print_info "You selected to stake IP."
+                stake_ip  # Call the stake IP function
+                ;;
+            14)
+                print_info "You selected to unstake IP."
+                unstake_ip  # Call the unstake IP function
                 ;;
             15)
                 print_info "You selected to remove the node."
@@ -752,7 +752,7 @@ node_management_menu() {
                 break
                 ;;
             *)
-                print_info "Invalid option, please select a number between 1 and 11." 
+                print_info "Invalid option, please select a number between 1 and 16." 
                 ;;
         esac
     done
