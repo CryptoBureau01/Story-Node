@@ -386,33 +386,46 @@ update_snapshot() {
 stake_ip() {
     print_info "<================= Stake IP ================>"
 
+    # Path to the private key (automatically imported from file)
+    PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
+
     # Inform the user about the requirement to have at least 1 IP in their wallet
     print_info "You need to have at least 1 IP in your wallet to proceed with staking."
     print_info "Get it from the faucet: https://faucet.story.foundation/"
 
+    MAX_CHECKS=10  # Maximum number of sync checks
+    count=0
+
     while true; do
         # Check sync status (ensure 'catching_up' is false)
         print_info "Checking the sync status..."
+
         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
-        if [ "$SYNC_STATUS" == "false" ]; then
-            print_info "Node is synced. Proceeding to validator registration."
-            break  # Exit the loop if the node is synced
-        else
+        if [ "$SYNC_STATUS" == "true" ]; then
             print_info "Node is still catching up. Please check the sync status:"
             print_info "Run the following command to check the sync info:"
             print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
             print_info "The sync status is currently catching_up: true."
 
+            count=$((count + 1))  # Increment the count
+
+            if [ $count -ge $MAX_CHECKS ]; then
+                print_info "Reached the maximum number of checks. Returning to the Node Management Menu..."
+                return  # Exit the function and return to the menu
+            fi
+
             # Ask user if they want to check again or return to the menu
             read -p "Do you want to check the sync status again? (y/n): " user_choice
             if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                continue  # Continue the loop to check sync status again
+                continue  # Check the sync status again
             else
                 print_info "Returning to the Node Management Menu..."
-                node_management_menu  # Call the node_management_menu function directly
-                return  # Exit the current function
+                return  # Exit the function and return to the menu
             fi
+        else
+            print_info "Node sync complete. Proceeding to validator registration."
+            break  # Exit the loop if the node is synced
         fi
     done
 
@@ -420,19 +433,13 @@ stake_ip() {
     read -p "Enter the amount of IP you want to stake (minimum 1 IP): " STAKE_AMOUNT
 
     # Validate input (minimum stake must be 1)
-    if [[ "$STAKE_AMOUNT" -lt 1 ]]; then
+    if [ "$STAKE_AMOUNT" -lt 1 ]; then
         print_info "The stake amount must be at least 1 IP. Exiting."
         exit 1
     fi
 
-    # Convert stake amount to Wei
-    STAKE_WEI=$(awk "BEGIN {printf \"%d\", $STAKE_AMOUNT * 1000000000000000000}")
-
-    # Check if the stake amount is valid
-    if [[ -z "$STAKE_WEI" || "$STAKE_WEI" -le 0 ]]; then
-        print_info "Invalid stake amount after conversion. Please check your input."
-        exit 1
-    fi
+    # Convert stake amount to the required format (multiply by 10^18)
+    STAKE_WEI=$(echo "$STAKE_AMOUNT * 1000000000000000000" | bc)
 
     # Register the validator using the imported private key
     story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
