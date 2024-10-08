@@ -670,7 +670,7 @@ print_info "<================= Private key ===============>"
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
         # Read the private key and remove 'PRIVATE_KEY=' prefix and any whitespace
-        local private_key=$(grep -oP '(?<=PRIVATE_KEY=).*' "$PRIVATE_KEY_PATH" | tr -d ' ')
+        local private_key=$(grep -oP '(?<=PRIVATE_KEY=).*' "$PRIVATE_KEY" | tr -d ' ')
 
         # Check if the private key is empty
         if [[ -z "$private_key" ]]; then
