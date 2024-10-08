@@ -11,6 +11,12 @@ print_error() {
 }
 
 
+# Read the private key without adding any spaces or formatting
+PRIVATE_KEY=$(cat /root/.story/story/config/private_key.txt | sed 's/PRIVATE_KEY=//')
+
+# Specify the path to the private key file
+PRIVATE_KEY_PATH="/root/.story/story/config/private_key.txt"
+
 
 
 # Function to ensure go/bin is in PATH
@@ -460,9 +466,6 @@ check_sync_and_stake() {
 unstake_ip() {
     print_info "<================= Unstake IP ================>"
 
-    # Path to the private key (automatically imported from file)
-    PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
-
     # Inform the user about the requirement to have staked IP
     print_info "You need to have staked IP in order to proceed with unstaking."
     
@@ -575,6 +578,8 @@ start_nodes() {
     node_management_menu
 }
 
+
+
 # Function to stop nodes
 stop_nodes() {
     print_info "<================= Stop Nodes ================>"
@@ -584,6 +589,8 @@ stop_nodes() {
     print_info "Story and Story Geth services stopped."
     node_management_menu
 }
+
+
 
 # Function to check node sync status
 check_node_status() {
@@ -598,6 +605,9 @@ check_node_status() {
     # Return to node management menu
     node_management_menu
 }
+
+
+
 
 # Function to display validator info
 show_validator_info() {
@@ -629,7 +639,6 @@ show_validator_info() {
     node_management_menu
 }
 
-private_key_file="/root/.story/story/config/private_key.txt"
 
 
 
@@ -638,11 +647,11 @@ check_balance() {
     local private_key_file="/root/.story/story/config/private_key.txt"  # Absolute path to the private key file
 
     # Debugging: Print the path being checked
-    print_info "Checking private key file at: $private_key_file"
+    print_info "Checking private key file at: $PRIVATE_KEY_PATH"
 
     # Check if the private key file exists
-    if [[ -f "$private_key_file" ]]; then
-        local private_key=$(cat "$private_key_file")  # Read the private key
+    if [[ -f "$PRIVATE_KEY_PATH" ]]; then
+        local private_key=$(cat "$PRIVATE_KEY")  # Read the private key
         
         # Get the address from the private key
         local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
@@ -681,7 +690,7 @@ check_balance() {
         print_info "Address: $address"
         print_info "Balance: $balance_in_ip IP"
     else
-        print_info "Private key file does not exist. Please check the path: $private_key_file"
+        print_info "Private key file does not exist. Please check the path: $PRIVATE_KEY_PATH"
     fi
 
     # Return to node management menu
