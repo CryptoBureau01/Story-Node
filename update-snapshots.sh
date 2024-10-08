@@ -22,18 +22,33 @@ if ! sudo apt-get install wget lz4 -y; then
     exit 1
 fi
 
+# Check if private key exists and backup priv_validator_state.json
+private_key_path="$HOME/.story/story/data/priv_validator_state.json"
+backup_path="$HOME/.story/priv_validator_state.json.backup"
+
+
+
 # Stop Story and Story-Geth services
 print_info "Stopping the Story and Story-Geth services..."
 sudo systemctl stop story
 sudo systemctl stop story-geth
 
 
-# Backup priv_validator_state.json
-print_info "Backing up priv_validator_state.json..."
-if ! sudo cp $HOME/.story/story/data/priv_validator_state.json $HOME/.story/priv_validator_state.json.backup; then
-    print_error "Failed to backup priv_validator_state.json"
-    exit 1
+
+# Check if private key file exists
+if [ -f "$private_key_path" ]; then
+    print_info "Private key found. Backing up priv_validator_state.json..."
+    
+    # Attempt to backup the private key file
+    if sudo cp "$private_key_path" "$backup_path"; then
+        print_info "Backup completed successfully. File saved as priv_validator_state.json.backup."
+    else
+        print_info "You are new and do not have a private key yet. Next time, I will back up your private key."
+    fi
+else
+    print_info "Private key does not exist. Moving to the next step..."
 fi
+
 
 
 # Delete previous chaindata and story data folders
@@ -85,10 +100,18 @@ if ! lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story; then
 fi
 
 # Restore priv_validator_state.json
-print_info "Restoring priv_validator_state.json..."
-if ! sudo cp $HOME/.story/priv_validator_state.json.backup $HOME/.story/story/data/priv_validator_state.json; then
-    print_error "Failed to restore priv_validator_state.json"
-    exit 1
+print_info "Checking for private key backup to restore..."
+if [ -f "$backup_path" ]; then
+    print_info "Backup found. Restoring priv_validator_state.json..."
+    
+    # Attempt to restore the private key file
+    if sudo cp "$backup_path" "$private_key_path"; then
+        print_info "Restore completed successfully. priv_validator_state.json restored."
+    else
+        print_info "Failed to restore priv_validator_state.json."
+    fi
+else
+    print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
 fi
 
 
