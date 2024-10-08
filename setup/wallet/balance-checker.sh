@@ -13,7 +13,7 @@ print_error() {
 
 
 # Load the private key path from the private-key-path.sh file
-source private-key-path.sh
+source ./private-key-path.sh
 
 # Debugging: Print the path being checked
 print_info "Checking private key file at: $PRIVATE_KEY_PATH"
@@ -21,7 +21,7 @@ print_info "Checking private key file at: $PRIVATE_KEY_PATH"
 # Check if the private key file exists
 if [[ -f "$PRIVATE_KEY_PATH" ]]; then
     # Read the private key and format it with spaces
-    local private_key=$(cat "$PRIVATE_KEY_PATH" | sed 's/.\{2\}/& /g')  # Insert spaces every two characters
+    local private_key=$(cat "$PRIVATE_KEY_PATH")  # Insert spaces every two characters
 
     # Get the address from the private key (assuming private key is in the required format)
     local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
