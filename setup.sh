@@ -489,8 +489,8 @@ unstake_ip() {
         exit 1
     fi
 
-    # Convert unstake amount to the required format (multiply by 10^18)
-    UNSTAKE_WEI=$(echo "$UNSTAKE_AMOUNT * 1000000000000000000" | bc)
+    # Convert stake amount to Wei (1 IP = 10^18 Wei)
+    UNSTAKE_WEI=$(awk "BEGIN {printf \"%d\", $UNSTAKE_AMOUNT * 1000000000000000000}")  # Ensure integer output
 
     # Unregister the validator using the imported private key
     story validator withdraw --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
