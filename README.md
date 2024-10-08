@@ -60,21 +60,6 @@ curl localhost:26657/status | jq
 ```
 
 
-
-# SYNC using snapshot File
-
-**Apply Mandragora snapshots (story client+story-geth)**
-
-Check the height of the snapshot (v0.10.1): Block Number -> 1016207
-
-
-
-   ## Download And Setup Sync-Snapshots File : 
-    
-    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/update-snapshots.sh && chmod +x update-snapshots.sh && ./update-snapshots.sh
-
-
-
     
 
 # Upgrade to Story v0.11.1
@@ -106,46 +91,6 @@ Check the height of the snapshot (v0.10.1): Block Number -> 1016207
     sudo systemctl start story-geth
 
 
-# Register your Validator
-
-### 1. Export wallet:
-```
-story validator export --export-evm-key
-```
-### 2. Private key preview
-```
-sudo nano ~/.story/story/config/private_key.txt
-```
-### 3. Import Key to Metamask 
-
-Get the wallet address for faucet
-
-### 4. You need at least have 1 IP on wallet
-
-Get it from faucet : https://faucet.story.foundation/
-
-Check the sync, the catching up must be 'false'
-```
-curl -s localhost:26657/status | jq
-```
-Stake only after "catching_up": false
-
-### 5. Validator registering
-
-Replace "your_private_key" with your key from the step2
-
-```
-story validator create --stake 1000000000000000000 --private-key "your_private_key"
-```
-
-### 6. Check your validator INFO
-```
-curl -s localhost:26657/status | jq -r '.result.validator_info' 
-```
-
-### 7. check your validator
-
-Explorer: https://testnet.story.explorers.guru/
 
 ## BACK UP FILE
 
