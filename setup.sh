@@ -495,7 +495,14 @@ show_logs() {
     fi
     
     # Show logs for 'story' service
-    journalctl -u story -f --lines=100
+    journalctl -u story --lines=100 &
+    PID=$!
+
+    # Wait for 10 seconds
+    sleep 10
+
+    # Kill the journalctl process
+    kill $PID
 
     print_info "Log display completed. Redirecting to the main menu..."
     
@@ -514,7 +521,14 @@ geth_logs() {
     fi
 
     # Show logs for 'story-geth' service
-    sudo journalctl -u story-geth -f -o --lines=100
+    sudo journalctl -u story-geth --lines=100 &
+    PID=$!
+
+    # Wait for 10 seconds
+    sleep 10
+
+    # Kill the journalctl process
+    kill $PID
 
 
     print_info "Log display completed. Redirecting to the main menu..."
@@ -524,7 +538,6 @@ geth_logs() {
 }
 
 
-# Function to show logs for 'story' service
 show_story_logs() {
     print_info "Displaying logs for 'story' service..."
 
@@ -534,15 +547,53 @@ show_story_logs() {
         exit 1
     fi
 
-    # Show logs for 'story' service
-    sudo journalctl -u story -f -o --lines=100
+    # Show logs for 'story' service and stop after 10 seconds
+    sudo journalctl -u story --lines=100 &
+    PID=$!
 
-     print_info "Log display completed. Redirecting to the main menu..."
+    # Wait for 10 seconds
+    sleep 10
+
+    # Kill the journalctl process
+    kill $PID
+
+    print_info "Log display completed. Redirecting to the main menu..."
      
-     # Return to node management menu
+    # Return to node management menu
     node_management_menu
 }
 
+
+
+# Function to display validator info
+show_validator_info() {
+    print_info "Fetching validator information from localhost:26657..."
+
+    # Check if curl is installed
+    if ! command -v curl &> /dev/null; then
+        print_error "curl is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Check if jq is installed
+    if ! command -v jq &> /dev/null; then
+        print_error "jq is not installed. Please install it first."
+        exit 1
+    fi
+
+    # Fetch and display validator info
+    validator_info=$(curl -s localhost:26657/status | jq -r '.result.validator_info')
+
+    if [ -n "$validator_info" ]; then
+        print_info "Validator Information:"
+        echo "$validator_info"
+    else
+        print_error "Failed to fetch validator information. Please check if the service is running."
+    fi
+
+    # Return to node management menu
+    node_management_menu
+}
 
 
     # Function to display the Node Management Menu
@@ -562,6 +613,7 @@ node_management_menu() {
         "Story-Logs"
         "Geth-Logs"
         "Nodes-Logs"
+        "Validator-Info"
         "Remove Node"
         "Exit"
     )
@@ -612,15 +664,19 @@ node_management_menu() {
                 ;;
             10)
                 print_info "You selected to Nodes Logs."
-                show_logs  # Call the remove node function
+                show_logs  # Call the Nodes Logs function
                 ;;
             11)
                 print_info "You selected to Geth Logs."
-                geth_logs  # Call the remove node function
+                geth_logs  # Call the Geth Logs function
                 ;;
             12)
                 print_info "You selected to Story Logs."
-                show_story_logs  # Call the remove node function
+                show_story_logs  # Call the Story Logs function
+                ;;
+            14)
+                print_info "Check Your Validator Info"
+                show_validator_info  # Call the Validator Info function
                 ;;
             13)
                 print_info "You selected to remove the node."
