@@ -171,10 +171,6 @@ else
     print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
 fi
 
-# Check if the services have started successfully
-print_info "Checking Story and Story-Geth status..."
-sudo systemctl status story
-sudo systemctl status story-geth
 
 # Final success message
 print_info "Congratulations, Snapshot Sync completed!"
