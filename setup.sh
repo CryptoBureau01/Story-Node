@@ -618,9 +618,7 @@ check_balance() {
 
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
-        local private_key=$(cat "$PRIVATE_KEY")  # Read the private key
-        
-        # Get the address from the private key
+        # Fetch the address from the private key (assuming you have a method to derive the address from it)
         local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
             "jsonrpc": "2.0",
             "method": "eth_accounts",
@@ -663,7 +661,6 @@ check_balance() {
     # Return to node management menu
     node_management_menu
 }
-
 
 check_private_key() {
     print_info "<================= Private Key ===============>"
