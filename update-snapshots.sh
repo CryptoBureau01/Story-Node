@@ -9,18 +9,6 @@ print_error() {
     echo -e "\033[1;31m$1\033[0m"
 }
 
-# Function to get user confirmation before deletion
-confirm_deletion() {
-    while true; do
-        read -p "Are you sure you want to delete previous data? (y/n): " choice
-        case "$choice" in
-            [Yy]* ) return 0;;  # If user presses y/Y, return success
-            [Nn]* ) return 1;;  # If user presses n/N, return failure
-            * ) echo "Please answer y or n.";;
-        esac
-    done
-}
-
 # Ensure the script is run as root
 if [ "$EUID" -ne 0 ]; then
     print_error "Please run as root"
@@ -70,11 +58,9 @@ fi
 case $snapshot_choice in
     1)
         print_info "You selected Geth Snapshot."
-        # Geth Snapshot logic
         ;;
     2)
         print_info "You selected Story Snapshot."
-        # Story Snapshot logic
         ;;
     3)
         print_info "Exiting the script."
@@ -85,16 +71,29 @@ case $snapshot_choice in
         ;;
 esac
 
-# Ask for confirmation before deleting the previous data
+# Confirm deletion
+confirm_deletion() {
+    while true; do
+        read -p "Are you sure you want to delete previous data? (y/n): " choice
+        case "$choice" in
+            [Yy]* ) return 0;;  # If user presses y/Y, return success
+            [Nn]* ) return 1;;  # If user presses n/N, return failure
+            * ) echo "Please answer y or n.";;
+        esac
+    done
+}
+
+# Call the confirmation function
 if confirm_deletion; then
+    # If user confirms deletion
     print_info "Deleting previous data..."
     sudo rm -rf $HOME/.story/geth/iliad/geth/chaindata
     sudo rm -rf $HOME/.story/story/data
 else
-    print_info "Data deletion aborted by user. Exiting script."
-    exit 0
+    print_info "Skipping data deletion. Proceeding with installation."
 fi
 
+# Proceed with snapshot installation without data deletion
 if [ "$snapshot_choice" == "1" ]; then
     # Geth Snapshot Installation Process
     print_info "You selected Geth Snapshot."
@@ -166,7 +165,7 @@ if [ -f "$backup_path" ]; then
     if sudo cp "$backup_path" "$private_key_path"; then
         print_info "Restore completed successfully. priv_validator_state.json restored."
     else
-        print_error "Failed to restore priv_validator_state.json."
+        print_info "Failed to restore priv_validator_state.json."
     fi
 else
     print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
