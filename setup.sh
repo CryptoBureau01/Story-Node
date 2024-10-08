@@ -181,7 +181,8 @@ setup_story_geth() {
 
     # Cleanup
     print_info "Cleaning up downloaded files..."
-    rm -f geth-linux-amd64-0.9.3-b224fdf.tar.gz
+    rm -f /root/geth-linux-amd64-0.9.3-b224fdf.tar.gz
+    rm -f /root/geth-linux-amd64-0.9.3-b224fdf
 
     print_info "Story-Geth has been successfully updated to version 0.9.3!"
 
@@ -252,7 +253,8 @@ setup_story_binary() {
 
     # Cleanup
     print_info "Cleaning up downloaded files..."
-    rm -f story-linux-amd64-0.10.1-57567e5.tar.gz
+    rm -f /root/story-linux-amd64-0.10.1-57567e5.tar.gz
+    rm -rf /root/story-linux-amd64-0.10.1-57567e5
 
     print_info "Story has been successfully updated to version 0.10.1!"
 
