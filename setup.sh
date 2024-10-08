@@ -393,6 +393,9 @@ stake_ip() {
         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
         if [ "$SYNC_STATUS" == "false" ]; then
+            print_info "Node is synced. Proceeding to validator registration."
+            break  # Exit the loop if the node is synced
+        else
             print_info "Node is still catching up. Please check the sync status:"
             print_info "Run the following command to check the sync info:"
             print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
@@ -401,14 +404,13 @@ stake_ip() {
             # Ask user if they want to check again or return to the menu
             read -p "Do you want to check the sync status again? (y/n): " user_choice
             if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                continue  # Check the sync status again
+                check_sync_and_stake  # Call the function again to check sync status
+                return  # Exit the current function after calling
             else
                 print_info "Returning to the Node Management Menu..."
-                return  # Exit the function and return to the menu
+                node_management_menu  # Call the node_management_menu function directly
+                return  # Exit the current function after calling
             fi
-        else
-            print_info "Node sync complete. Proceeding to validator registration."
-            break  # Exit the loop if the node is synced
         fi
     done
 
@@ -439,6 +441,21 @@ stake_ip() {
     node_management_menu
 }
 
+check_sync_and_stake() {
+    while true; do
+        read -p "Do you want to stake IP? (y/n): " user_input
+        if [[ "$user_input" =~ ^[Yy]$ ]]; then
+            stake_ip  # Call the stake_ip function to proceed with staking
+            break
+        elif [[ "$user_input" =~ ^[Nn]$ ]]; then
+            print_info "Returning to the Node Management Menu..."
+            node_management_menu  # Call the node_management_menu function directly
+            break  # Exit the loop after calling the menu
+        else
+            print_info "Invalid input. Please enter 'y' or 'n'."
+        fi
+    done
+}
 
 unstake_ip() {
     print_info "<================= Unstake IP ================>"
@@ -467,10 +484,11 @@ unstake_ip() {
             # Ask user if they want to check again or return to the menu
             read -p "Do you want to check the sync status again? (y/n): " user_choice
             if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                continue  # Check the sync status again
+                check_sync_and_unstake  # Check the sync status again
             else
                 print_info "Returning to the Node Management Menu..."
-                return  # Exit the function and return to the menu
+                node_management_menu  # Call the node_management_menu function directly
+                return  # Exit the current function after calling
             fi
         fi
     done
@@ -502,7 +520,21 @@ unstake_ip() {
     node_management_menu
 }
 
-
+check_sync_and_unstake() {
+    while true; do
+        read -p "Do you want to stake IP? (y/n): " user_input
+        if [[ "$user_input" =~ ^[Yy]$ ]]; then
+            unstake_ip  # Call the stake_ip function to proceed with staking
+            break
+        elif [[ "$user_input" =~ ^[Nn]$ ]]; then
+            print_info "Returning to the Node Management Menu..."
+            node_management_menu  # Call the node_management_menu function directly
+            break  # Exit the loop after calling the menu
+        else
+            print_info "Invalid input. Please enter 'y' or 'n'."
+        fi
+    done
+}
 
 
 remove_node() {
@@ -598,32 +630,16 @@ show_validator_info() {
 }
 
 
-# Function to check the private key
-check_private_key() {
-    if [[ -f ~/.story/story/config/private_key.txt ]]; then
-        # Path to the private key (automatically imported from file)
-        PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
-
-        if [[ -z "$PRIVATE_KEY" ]]; then
-            print_info "Private key is missing or empty."
-        else
-            print_info "Private key found: $PRIVATE_KEY"
-        fi
-    else
-        print_info "Private key file does not exist."
-    fi
-
-    # Return to node management menu
-    node_management_menu
-}
-
 # Function to check the balance of an address using a private key
 check_balance() {
-    local private_key_file="~/.story/story/config/private_key.txt"
-    
+    local private_key_file="/root/.story/story/config/private_key.txt"  # Absolute path to the private key file
+
+    # Debugging: Print the path being checked
+    print_info "Checking private key file at: $private_key_file"
+
     # Check if the private key file exists
     if [[ -f "$private_key_file" ]]; then
-        local private_key=$(sudo cat "$private_key_file")
+        local private_key=$(cat "$private_key_file")  # Read the private key
         
         # Get the address from the private key
         local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
@@ -633,6 +649,13 @@ check_balance() {
             "id": 1
         }' | jq -r '.result[0]')
 
+        # Check if the address was retrieved successfully
+        if [[ -z "$address" ]]; then
+            print_info "Unable to retrieve address from the private key."
+            node_management_menu
+            return
+        fi
+
         # Fetch the balance using the address
         local balance=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
             "jsonrpc": "2.0",
@@ -641,6 +664,13 @@ check_balance() {
             "id": 1
         }' | jq -r '.result')
 
+        # Check if the balance was retrieved successfully
+        if [[ "$balance" == "null" ]]; then
+            print_info "Unable to retrieve balance. Please check the address."
+            node_management_menu
+            return
+        fi
+
         # Convert balance from Wei to IP tokens (assuming 1 IP = 1e18 Wei)
         local balance_in_ip=$(bc <<< "scale=18; $balance / 1000000000000000000")
 
@@ -648,7 +678,7 @@ check_balance() {
         print_info "Address: $address"
         print_info "Balance: $balance_in_ip IP"
     else
-        print_info "Private key file does not exist."
+        print_info "Private key file does not exist. Please check the path: $private_key_file"
     fi
 
     # Return to node management menu
