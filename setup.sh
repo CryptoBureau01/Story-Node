@@ -291,17 +291,21 @@ setup_moniker_name() {
 update_peers() {
     print_info "<================= Setup Peers ================>"
 
-    # Get active peers from the RPC server
-    PEERS=$(curl -s -X POST https://rpc-story.josephtran.xyz -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","method":"net_info","params":[],"id":1}' | jq -r '.result.peers[] | select(.connection_status.SendMonitor.Active == true) | "\(.node_info.id)@\(if .node_info.listen_addr | contains("0.0.0.0") then .remote_ip + ":" + (.node_info.listen_addr | sub("tcp://0.0.0.0:"; "")) else .node_info.listen_addr | sub("tcp://"; "") end)"' | tr '\n' ',' | sed 's/,$//' | awk '{print "\"" $0 "\""}')
+    # Updating and define peers
+    PEERS="10f4a5147c5ae2e4707e9077aad44dd1c3fc7cd3@116.202.217.20:37656,ccb6e8d1788bd46be4abec716e98236c2e21c067@116.202.51.143:26656,17d69e7e7f6b43ef414ee6a4b2585bd9ee0446ce@135.181.139.249:46656,51c6bda6a2632f2d105623026e1caf12743fb91c@204.137.14.33:36656,2027b0adffea21f09d28effa3c09403979b77572@198.178.224.25:26656,56e241d794ec8c12c7a28aa7863db1322589de0a@144.76.202.120:36656,5d7507dbb0e04150f800297eaba39c5161c034fe@135.125.188.77:26656,f8b29354fbe832c1cb011b2fbe4f930f89a0d430@188.245.60.19:26656,c1b1fb63cb1217e6c342c0fd7edf28902e33f189@100.42.179.9:26656,2a77804d55ec9e05b411759c70bc29b5e9d0cce0@165.232.184.59:26656,d6416eb44f9136fc3b03535ae588f63762a67f8e@211.219.19.141:31656,84d347aba1869b924a6d709f133f7b135202a787@84.247.136.201:26656"
 
-    # Update the persistent_peers in config.toml
-    sed -i "s/^persistent_peers *=.*/persistent_peers = $PEERS/" "$HOME/.story/story/config/config.toml"
+    # Update peers in config.toml
+    CONFIG_FILE="$HOME/.story/story/config/config.toml"
 
-    if [ $? -eq 0 ]; then
-        print_info "Configuration file updated successfully with new peers."
-    else
-        print_error "Failed to update configuration file."
-    fi
+    # Check if the config file exists
+      if [[ -f "$CONFIG_FILE" ]]; then
+        # Update the persistent_peers line
+          sed -i "s/^persistent_peers *=.*/persistent_peers = \"$PEERS\"/" "$CONFIG_FILE"
+           print_info "Updated persistent_peers in $CONFIG_FILE."
+      else
+           print_info "Config file not found: $CONFIG_FILE"
+           exit 1
+      fi
 
     # Create story-geth service file
     sudo tee /etc/systemd/system/story-geth.service > /dev/null <<EOF
@@ -423,9 +427,9 @@ stake_ip() {
     # Register the validator using the imported private key
     story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
 
-    # Wait for 5 minutes (300 seconds) before proceeding
-    print_info "Waiting for 5 minutes for the changes to reflect..."
-    sleep 300
+    # Wait for 2 minutes (120 seconds) before proceeding
+    print_info "Waiting for 2 minutes for the changes to reflect..."
+    sleep 120
 
     # Inform the user where they can check their validator
     print_info "You can check your validator's status and stake on the following explorer:"
@@ -434,6 +438,70 @@ stake_ip() {
     # Return to node management menu
     node_management_menu
 }
+
+
+unstake_ip() {
+    print_info "<================= Unstake IP ================>"
+
+    # Path to the private key (automatically imported from file)
+    PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
+
+    # Inform the user about the requirement to have staked IP
+    print_info "You need to have staked IP in order to proceed with unstaking."
+    
+    # Check sync status (ensure 'catching_up' is false)
+    while true; do
+        print_info "Checking the sync status..."
+
+        SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
+
+        if [ "$SYNC_STATUS" == "false" ]; then
+            print_info "Node sync complete. Proceeding to unstake."
+            break  # Exit the loop if the node is synced
+        else
+            print_info "Node is still catching up. Please check the sync status:"
+            print_info "Run the following command to check the sync info:"
+            print_info "curl -s localhost:26657/status | jq '.result.sync_info'"
+            print_info "The sync status is currently catching_up: true."
+
+            # Ask user if they want to check again or return to the menu
+            read -p "Do you want to check the sync status again? (y/n): " user_choice
+            if [[ "$user_choice" =~ ^[Yy]$ ]]; then
+                continue  # Check the sync status again
+            else
+                print_info "Returning to the Node Management Menu..."
+                return  # Exit the function and return to the menu
+            fi
+        fi
+    done
+
+    # Ask the user how many IP they want to unstake
+    read -p "Enter the amount of IP you want to unstake (minimum 1 IP): " UNSTAKE_AMOUNT
+
+    # Validate input (minimum unstake must be 1)
+    if [ "$UNSTAKE_AMOUNT" -lt 1 ]; then
+        print_info "The unstake amount must be at least 1 IP. Exiting."
+        exit 1
+    fi
+
+    # Convert unstake amount to the required format (multiply by 10^18)
+    UNSTAKE_WEI=$(echo "$UNSTAKE_AMOUNT * 1000000000000000000" | bc)
+
+    # Unregister the validator using the imported private key
+    story validator withdraw --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
+
+    # Wait for 2 minutes (120 seconds) before proceeding
+    print_info "Waiting for 2 minutes for the changes to reflect..."
+    sleep 120
+
+    # Inform the user where they can check their validator
+    print_info "You can check your validator's status and unstaking on the following explorer:"
+    print_info "Explorer: https://testnet.story.explorers.guru/"
+
+    # Return to node management menu
+    node_management_menu
+}
+
 
 
 
@@ -485,87 +553,19 @@ stop_nodes() {
     node_management_menu
 }
 
+# Function to check node sync status
+check_node_status() {
+    status=$(curl -s localhost:26657/status | jq -r '.result.sync_info.catching_up')
 
-# Function to show logs
-show_logs() {
-    print_info "Displaying logs for 'story' service..."
-    
-    # Check if journalctl is installed
-    if ! command -v journalctl &> /dev/null; then
-        print_error "journalctl is not installed. Please install it first."
-        exit 1
-    fi
-    
-    # Show logs for 'story' service
-    journalctl -u story --lines=100 &
-    PID=$!
-
-    # Wait for 10 seconds
-    sleep 10
-
-    # Kill the journalctl process
-    kill $PID
-
-    print_info "Log display completed. Redirecting to the main menu..."
-    
-     # Return to node management menu
-    node_management_menu
-}
-
-# Function to show logs
-geth_logs() {
-    print_info "Displaying logs for 'story-geth' service..."
-
-    # Check if journalctl is installed
-    if ! command -v journalctl &> /dev/null; then
-        print_error "journalctl is not installed. Please install it first."
-        exit 1
+    if [[ "$status" == "false" ]]; then
+        print_info "Node is fully synced with the network."
+    else
+        print_info "Node is currently catching up and is not fully synced with the network."
     fi
 
-    # Show logs for 'story-geth' service
-    sudo journalctl -u story-geth --lines=100 &
-    PID=$!
-
-    # Wait for 10 seconds
-    sleep 10
-
-    # Kill the journalctl process
-    kill $PID
-
-
-    print_info "Log display completed. Redirecting to the main menu..."
-    
-     # Return to node management menu
-    node_management_menu
-}
-
-
-show_story_logs() {
-    print_info "Displaying logs for 'story' service..."
-
-    # Check if journalctl is installed
-    if ! command -v journalctl &> /dev/null; then
-        print_error "journalctl is not installed. Please install it first."
-        exit 1
-    fi
-
-    # Show logs for 'story' service and stop after 10 seconds
-    sudo journalctl -u story --lines=100 &
-    PID=$!
-
-    # Wait for 10 seconds
-    sleep 10
-
-    # Kill the journalctl process
-    kill $PID
-
-    print_info "Log display completed. Redirecting to the main menu..."
-     
     # Return to node management menu
     node_management_menu
 }
-
-
 
 # Function to display validator info
 show_validator_info() {
@@ -598,25 +598,83 @@ show_validator_info() {
 }
 
 
+# Function to check the private key
+check_private_key() {
+    if [[ -f ~/.story/story/config/private_key.txt ]]; then
+        private_key=$(sudo cat ~/.story/story/config/private_key.txt)
+
+        if [[ -z "$private_key" ]]; then
+            print_info "Private key is missing or empty."
+        else
+            print_info "Private key found: $private_key"
+        fi
+    else
+        print_info "Private key file does not exist."
+    fi
+
+    # Return to node management menu
+    node_management_menu
+}
+
+# Function to check the balance of an address using a private key
+check_balance() {
+    local private_key_file="$HOME/.story/story/config/private_key.txt"
+    
+    # Check if the private key file exists
+    if [[ -f "$private_key_file" ]]; then
+        local private_key=$(sudo cat "$private_key_file")
+        
+        # Get the address from the private key
+        local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
+            "jsonrpc": "2.0",
+            "method": "eth_accounts",
+            "params": [],
+            "id": 1
+        }' | jq -r '.result[0]')
+
+        # Fetch the balance using the address
+        local balance=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
+            "jsonrpc": "2.0",
+            "method": "eth_getBalance",
+            "params": ["'$address'", "latest"],
+            "id": 1
+        }' | jq -r '.result')
+
+        # Convert balance from Wei to IP tokens (assuming 1 IP = 1e18 Wei)
+        local balance_in_ip=$(bc <<< "scale=18; $balance / 1000000000000000000")
+
+        # Print the balance information
+        print_info "Address: $address"
+        print_info "Balance: $balance_in_ip IP"
+    else
+        print_info "Private key file does not exist."
+    fi
+
+    # Return to node management menu
+    node_management_menu
+}
+
+
     # Function to display the Node Management Menu
 node_management_menu() {
     print_info "<================= Node Management Menu ===============>"
     
     options=(
-        "Install dependencies"
+        "Install-Dependencies"
         "Story-Geth Binary Setup"
         "Story Binary Setup"
         "Setup Moniker Name"
-        "Update Peers"
-        "Update Snapshot"
-        "Stake IP"
-        "Stop Node"
-        "Start Node"
-        "Story-Logs"
-        "Geth-Logs"
-        "Nodes-Logs"
+        "Update-Peers"
+        "Update-Snapshot"
+        "Stop-Node"
+        "Start-Node"
+        "Node-Status"
         "Validator-Info"
-        "Remove Node"
+        "Private-Key Checker"
+        "Balance-Checker"
+        "Stake-IP"
+        "unStake-IP"
+        "Remove-Node"
         "Exit"
     )
 
@@ -657,34 +715,38 @@ node_management_menu() {
                 stake_ip  # Call the stake IP function
                 ;;
             8)
+                print_info "You selected to unstake IP."
+                unstake_ip  # Call the unstake IP function
+                ;;
+            9)
                 print_info "You selected to stop the node."
                 stop_nodes  # Call the stop node function
                 ;;
-            9)
+            10)
                print_info "You selected to start the node."
                 start_nodes  # Call the start node function
                 ;;
-            10)
-                print_info "You selected to Nodes Logs."
-                show_logs  # Call the Nodes Logs function
-                ;;
             11)
-                print_info "You selected to Geth Logs."
-                geth_logs  # Call the Geth Logs function
+                print_info "Starting the node status check..."
+                check_node_status # Call the Node Status function
                 ;;
             12)
-                print_info "You selected to Story Logs."
-                show_story_logs  # Call the Story Logs function
-                ;;
-            14)
                 print_info "Check Your Validator Info"
                 show_validator_info  # Call the Validator Info function
                 ;;
             13)
+                print_info "Check Your Private Key."
+                check_private_key  # Call the Private Key Checker function
+                ;;
+            14)
+                print_info "Check Your Account Balance Check!."
+                check_balance  # Call the Account Balance Checker function
+                ;;
+            15)
                 print_info "You selected to remove the node."
                 remove_node  # Call the remove node function
                 ;;
-            14)
+            16)
                 print_info "Exiting the script."
                 break
                 ;;
