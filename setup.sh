@@ -385,9 +385,6 @@ update_snapshot() {
 stake_ip() {
     print_info "<================= Stake IP ================>"
 
-    # Path to the private key (automatically imported from file)
-    PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
-
     # Inform the user about the requirement to have at least 1 IP in their wallet
     print_info "You need to have at least 1 IP in your wallet to proceed with staking."
     print_info "Get it from the faucet: https://faucet.story.foundation/"
