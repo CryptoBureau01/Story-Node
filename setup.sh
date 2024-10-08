@@ -11,11 +11,12 @@ print_error() {
 }
 
 
-# Read the private key without adding any spaces or formatting
-PRIVATE_KEY=$(cat /root/.story/story/config/private_key.txt | sed 's/PRIVATE_KEY=//')
-
 # Specify the path to the private key file
 PRIVATE_KEY_PATH="/root/.story/story/config/private_key.txt"
+
+# Read the private key without adding any spaces or formatting
+PRIVATE_KEY=$(cat "$PRIVATE_KEY_PATH" | sed 's/PRIVATE_KEY=//')
+
 
 
 
@@ -664,22 +665,22 @@ check_balance() {
 }
 
 
-# Function to check if the private key is valid
 check_private_key() {
-print_info "<================= Private key ===============>"
+    print_info "<================= Private Key ===============>"
+
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
-        # Read the private key and remove 'PRIVATE_KEY=' prefix and any whitespace
-        local private_key=$(grep -oP '(?<=PRIVATE_KEY=).*' "$PRIVATE_KEY" | tr -d ' ')
+        # Print the private key directly
+        echo "Private key: $PRIVATE_KEY"
 
         # Check if the private key is empty
-        if [[ -z "$private_key" ]]; then
+        if [[ -z "$PRIVATE_KEY" ]]; then
             echo "Private key is empty. Please check the file."
             return 1
         fi
 
         # Check if the private key is 64 characters long (assuming it's a valid hex string)
-        if [[ ${#private_key} -ne 64 ]]; then
+        if [[ ${#PRIVATE_KEY} -ne 64 ]]; then
             echo "Invalid private key format. A valid key should be 64 characters long."
             return 1
         fi
