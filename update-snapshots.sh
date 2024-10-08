@@ -26,14 +26,10 @@ fi
 private_key_path="$HOME/.story/story/data/priv_validator_state.json"
 backup_path="$HOME/.story/priv_validator_state.json.backup"
 
-
-
 # Stop Story and Story-Geth services
 print_info "Stopping the Story and Story-Geth services..."
 sudo systemctl stop story
 sudo systemctl stop story-geth
-
-
 
 # Check if private key file exists
 if [ -f "$private_key_path" ]; then
@@ -49,54 +45,99 @@ else
     print_info "Private key does not exist. Moving to the next step..."
 fi
 
+# Ask the user which snapshot to install
+print_info "Which snapshot would you like to install?"
+case $snapshot_choice in
+    1)
+        print_info "You selected Geth Snapshot."
+        # Geth Snapshot logic
+        ;;
+    2)
+        print_info "You selected Story Snapshot."
+        # Story Snapshot logic
+        ;;
+    3)
+        print_info "Exiting the script."
+        exit 0   # Exits the script
+        ;;
+    *)
+        print_info "Invalid option, please select a number between 1 and 3." 
+        ;;
+esac
 
+read -p "Please enter your choice (1 or 2 or 3): " snapshot_choice
+
+# Check user input and exit if invalid
+if [ "$snapshot_choice" != "1" ] && [ "$snapshot_choice" != "2" ]; then
+    print_error "Invalid choice. Please run the script again and select 1 or 2."
+    exit 1
+fi
 
 # Delete previous chaindata and story data folders
 print_info "Deleting previous data..."
 sudo rm -rf $HOME/.story/geth/iliad/geth/chaindata
 sudo rm -rf $HOME/.story/story/data
 
+if [ "$snapshot_choice" == "1" ]; then
+    # Geth Snapshot Installation Process
+    print_info "You selected Geth Snapshot."
+    
+    # Check and delete the old Geth snapshot if it exists
+    if [ -f "$HOME/geth_snapshot.lz4" ]; then
+        print_info "Old Geth snapshot found. Deleting..."
+        rm "$HOME/geth_snapshot.lz4"
+    fi
 
-# Check and delete the old Geth snapshot if it exists
-if [ -f "$HOME/geth_snapshot.lz4" ]; then
-    print_info "Old geth snapshot found. Deleting..."
-    rm "$HOME/geth_snapshot.lz4"
-fi
+    # Download the new Geth snapshot
+    print_info "Downloading the Geth snapshot..."
+    cd $HOME
+    if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
+        print_error "Failed to download Geth snapshot"
+        exit 1
+    fi
 
-# Download the new Geth snapshot
-print_info "Downloading the Geth snapshot..."
-cd $HOME
-if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
-    print_error "Failed to download geth snapshot"
-    exit 1
-fi
+    # Unzip Geth snapshot
+    print_info "Extracting Geth snapshot..."
+    if ! lz4 -c -d geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth; then
+        print_error "Failed to extract Geth snapshot"
+        exit 1
+    fi
 
+    # Delete the Geth snapshot file after extraction
+    if ! rm -f geth_snapshot.lz4; then
+        print_error "Failed to delete the Geth snapshot file"
+        exit 1
+    fi
 
-# Check and delete the old Story snapshot if it exists
-if [ -f "$HOME/story_snapshot.lz4" ]; then
-    print_info "Old Story snapshot found. Deleting..."
-    rm "$HOME/story_snapshot.lz4"
-fi
+elif [ "$snapshot_choice" == "2" ]; then
+    # Story Snapshot Installation Process
+    print_info "You selected Story Snapshot."
 
-# Download the new Story snapshot
-print_info "Downloading the Story snapshot..."
-if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
-    print_error "Failed to download Story snapshot"
-    exit 1
-fi
+    # Check and delete the old Story snapshot if it exists
+    if [ -f "$HOME/story_snapshot.lz4" ]; then
+        print_info "Old Story snapshot found. Deleting..."
+        rm "$HOME/story_snapshot.lz4"
+    fi
 
-# Unzip Geth snapshot
-print_info "Extracting Geth snapshot..."
-if ! lz4 -c -d geth_snapshot.lz4 | tar -xv -C $HOME/.story/geth/iliad/geth; then
-    print_error "Failed to extract Geth snapshot"
-    exit 1
-fi
+    # Download the new Story snapshot
+    print_info "Downloading the Story snapshot..."
+    if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
+        print_error "Failed to download Story snapshot"
+        exit 1
+    fi
 
-# Unzip Story snapshot
-print_info "Extracting Story snapshot..."
-if ! lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story; then
-    print_error "Failed to extract Story snapshot"
-    exit 1
+    # Unzip Story snapshot
+    print_info "Extracting Story snapshot..."
+    if ! lz4 -c -d story_snapshot.lz4 | tar -xv -C $HOME/.story/story; then
+        print_error "Failed to extract Story snapshot"
+        exit 1
+    fi
+
+    # Delete the Story snapshot file after extraction
+    if ! rm -f story_snapshot.lz4; then
+        print_error "Failed to delete the Story snapshot file"
+        exit 1
+    fi
 fi
 
 # Restore priv_validator_state.json
@@ -114,25 +155,10 @@ else
     print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
 fi
 
-
 # Check if the services have started successfully
 print_info "Checking Story and Story-Geth status..."
 sudo systemctl status story
 sudo systemctl status story-geth
 
-
-# Delete the snapshot file after extraction
-if ! rm -f geth_snapshot.lz4; then
-    print_error "Failed to delete the Story snapshot file"
-    exit 1
-fi
-
-# Delete the snapshot file after extraction
-if ! rm -f story_snapshot.lz4; then
-    print_error "Failed to delete the Story snapshot file"
-    exit 1
-fi
-
-
 # Final success message
-print_info "Congratulations, Sync Snapshot completed!"
+print_info "Congratulations, Snapshot Sync completed!"
