@@ -426,7 +426,7 @@ stake_ip() {
     fi
 
     # Convert stake amount to the required format (multiply by 10^18)
-    STAKE_WEI=$(echo "$STAKE_AMOUNT * 1000000000000000000" | bc)
+    STAKE_WEI=$(awk "BEGIN {print $STAKE_AMOUNT * 1000000000000000000}")
 
     # Register the validator using the imported private key
     story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
