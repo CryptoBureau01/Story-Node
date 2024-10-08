@@ -420,13 +420,19 @@ stake_ip() {
     read -p "Enter the amount of IP you want to stake (minimum 1 IP): " STAKE_AMOUNT
 
     # Validate input (minimum stake must be 1)
-    if [ "$STAKE_AMOUNT" -lt 1 ]; then
+    if [[ "$STAKE_AMOUNT" -lt 1 ]]; then
         print_info "The stake amount must be at least 1 IP. Exiting."
         exit 1
     fi
 
-    # Convert stake amount to the required format (multiply by 10^18)
-    STAKE_WEI=$(awk "BEGIN {print $STAKE_AMOUNT * 1000000000000000000}")
+    # Convert stake amount to Wei
+    STAKE_WEI=$(awk "BEGIN {printf \"%d\", $STAKE_AMOUNT * 1000000000000000000}")
+
+    # Check if the stake amount is valid
+    if [[ -z "$STAKE_WEI" || "$STAKE_WEI" -le 0 ]]; then
+        print_info "Invalid stake amount after conversion. Please check your input."
+        exit 1
+    fi
 
     # Register the validator using the imported private key
     story validator create --stake "$STAKE_WEI" --private-key "$PRIVATE_KEY"
@@ -442,6 +448,7 @@ stake_ip() {
     # Return to node management menu
     node_management_menu
 }
+
 
 
 
