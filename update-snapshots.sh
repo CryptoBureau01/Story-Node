@@ -121,5 +121,18 @@ sudo systemctl status story
 sudo systemctl status story-geth
 
 
+# Delete the snapshot file after extraction
+if ! rm -f geth_snapshot.lz4; then
+    print_error "Failed to delete the Story snapshot file"
+    exit 1
+fi
+
+# Delete the snapshot file after extraction
+if ! rm -f story_snapshot.lz4; then
+    print_error "Failed to delete the Story snapshot file"
+    exit 1
+fi
+
+
 # Final success message
 print_info "Congratulations, Sync Snapshot completed!"
