@@ -629,6 +629,9 @@ show_validator_info() {
     node_management_menu
 }
 
+private_key_file="/root/.story/story/config/private_key.txt"
+
+
 
 # Function to check the balance of an address using a private key
 check_balance() {
