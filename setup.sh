@@ -395,7 +395,6 @@ stake_ip() {
     while true; do
         # Check sync status (ensure 'catching_up' is false)
         print_info "Checking the sync status..."
-
         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
         if [ "$SYNC_STATUS" == "false" ]; then
@@ -410,12 +409,11 @@ stake_ip() {
             # Ask user if they want to check again or return to the menu
             read -p "Do you want to check the sync status again? (y/n): " user_choice
             if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                check_sync_and_stake  # Call the function again to check sync status
-                return  # Exit the current function after calling
+                continue  # Continue the loop to check sync status again
             else
                 print_info "Returning to the Node Management Menu..."
                 node_management_menu  # Call the node_management_menu function directly
-                return  # Exit the current function after calling
+                return  # Exit the current function
             fi
         fi
     done
@@ -447,32 +445,15 @@ stake_ip() {
     node_management_menu
 }
 
-check_sync_and_stake() {
-    while true; do
-        read -p "Do you want to stake IP? (y/n): " user_input
-        if [[ "$user_input" =~ ^[Yy]$ ]]; then
-            stake_ip  # Call the stake_ip function to proceed with staking
-            break
-        elif [[ "$user_input" =~ ^[Nn]$ ]]; then
-            print_info "Returning to the Node Management Menu..."
-            node_management_menu  # Call the node_management_menu function directly
-            break  # Exit the loop after calling the menu
-        else
-            print_info "Invalid input. Please enter 'y' or 'n'."
-        fi
-    done
-}
+
 
 unstake_ip() {
     print_info "<================= Unstake IP ================>"
-
-    # Inform the user about the requirement to have staked IP
-    print_info "You need to have staked IP in order to proceed with unstaking."
+    print_info "You need to have staked IP to proceed with unstaking."
     
-    # Check sync status (ensure 'catching_up' is false)
+    # Check sync status
     while true; do
         print_info "Checking the sync status..."
-
         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.catching_up')
 
         if [ "$SYNC_STATUS" == "false" ]; then
@@ -485,13 +466,15 @@ unstake_ip() {
             print_info "The sync status is currently catching_up: true."
 
             # Ask user if they want to check again or return to the menu
-            read -p "Do you want to check the sync status again? (y/n): " user_choice
-            if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                check_sync_and_unstake  # Check the sync status again
-            else
+            read -p "Do you want to check the sync status again? (y/n): " user_input
+            if [[ "$user_input" =~ ^[Yy]$ ]]; then
+                continue  # Continue the loop to check sync status again
+            elif [[ "$user_input" =~ ^[Nn]$ ]]; then
                 print_info "Returning to the Node Management Menu..."
                 node_management_menu  # Call the node_management_menu function directly
-                return  # Exit the current function after calling
+                return  # Exit the function
+            else
+                print_info "Invalid input. Please enter 'y' or 'n'."
             fi
         fi
     done
@@ -523,21 +506,6 @@ unstake_ip() {
     node_management_menu
 }
 
-check_sync_and_unstake() {
-    while true; do
-        read -p "Do you want to stake IP? (y/n): " user_input
-        if [[ "$user_input" =~ ^[Yy]$ ]]; then
-            unstake_ip  # Call the stake_ip function to proceed with staking
-            break
-        elif [[ "$user_input" =~ ^[Nn]$ ]]; then
-            print_info "Returning to the Node Management Menu..."
-            node_management_menu  # Call the node_management_menu function directly
-            break  # Exit the loop after calling the menu
-        else
-            print_info "Invalid input. Please enter 'y' or 'n'."
-        fi
-    done
-}
 
 
 remove_node() {
@@ -611,6 +579,7 @@ check_node_status() {
 
 # Function to display validator info
 show_validator_info() {
+print_info "<================= Show Validator Info ===============>"
     print_info "Fetching validator information from localhost:26657..."
 
     # Check if curl is installed
@@ -644,7 +613,7 @@ show_validator_info() {
 
 # Function to check the balance of an address using a private key
 check_balance() {
-    local private_key_file="/root/.story/story/config/private_key.txt"  # Absolute path to the private key file
+    print_info "<================= Balance Checker ===============>"
 
     # Debugging: Print the path being checked
     print_info "Checking private key file at: $PRIVATE_KEY_PATH"
@@ -695,6 +664,39 @@ check_balance() {
 
     # Return to node management menu
     node_management_menu
+}
+
+
+# Function to check if the private key is valid
+check_private_key() {
+print_info "<================= Private key ===============>"
+    # Check if the private key file exists
+    if [[ -f "$PRIVATE_KEY_PATH" ]]; then
+        # Read the private key and remove 'PRIVATE_KEY=' prefix and any whitespace
+        local private_key=$(grep -oP '(?<=PRIVATE_KEY=).*' "$PRIVATE_KEY_PATH" | tr -d ' ')
+
+        # Check if the private key is empty
+        if [[ -z "$private_key" ]]; then
+            echo "Private key is empty. Please check the file."
+            return 1
+        fi
+
+        # Check if the private key is 64 characters long (assuming it's a valid hex string)
+        if [[ ${#private_key} -ne 64 ]]; then
+            echo "Invalid private key format. A valid key should be 64 characters long."
+            return 1
+        fi
+
+        echo "Private key is valid."
+        return 0
+    else
+        echo "Private key file does not exist at path: $PRIVATE_KEY_PATH"
+        return 1
+    fi
+
+    # Return to node management menu
+    node_management_menu
+    
 }
 
 
