@@ -11,9 +11,9 @@ print_error() {
 }
 
 # Import the private key from private-key-path.sh
-source ./setup/wallet/private-key-path.sh
+source ./setup/wallet/private-key-path.sh # Use relative path to source the file
 
 # Print the private key
 print_info "Your Private Key: $PRIVATE_KEY"
-
+print_info "Checking private key file at: $PRIVATE_KEY_PATH"
 
