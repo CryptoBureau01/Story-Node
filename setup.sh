@@ -601,12 +601,13 @@ show_validator_info() {
 # Function to check the private key
 check_private_key() {
     if [[ -f ~/.story/story/config/private_key.txt ]]; then
-        private_key=$(sudo cat ~/.story/story/config/private_key.txt)
+        # Path to the private key (automatically imported from file)
+        PRIVATE_KEY=$(cat ~/.story/story/config/private_key.txt | sed 's/^PRIVATE_KEY=//; s/^[ \t]*//; s/[ \t]*$//')
 
-        if [[ -z "$private_key" ]]; then
+        if [[ -z "$PRIVATE_KEY" ]]; then
             print_info "Private key is missing or empty."
         else
-            print_info "Private key found: $private_key"
+            print_info "Private key found: $PRIVATE_KEY"
         fi
     else
         print_info "Private key file does not exist."
@@ -618,7 +619,7 @@ check_private_key() {
 
 # Function to check the balance of an address using a private key
 check_balance() {
-    local private_key_file="$HOME/.story/story/config/private_key.txt"
+    local private_key_file="~/.story/story/config/private_key.txt"
     
     # Check if the private key file exists
     if [[ -f "$private_key_file" ]]; then
