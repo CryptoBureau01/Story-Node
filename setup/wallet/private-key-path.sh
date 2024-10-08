@@ -20,3 +20,5 @@ PRIVATE_KEY_PATH="/root/.story/story/config/private_key.txt"
 print_info "Your Private Key: $PRIVATE_KEY"
 print_info "Your Private Key Path: $PRIVATE_KEY_PATH"
 
+echo "PRIVATE_KEY=\"$PRIVATE_KEY\"" >> private-key-path.sh
+echo 'PRIVATE_KEY_PATH="/root/.story/story/config/private_key.txt"' >> private-key-path.sh
