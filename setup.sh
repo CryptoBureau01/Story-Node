@@ -507,7 +507,7 @@ unstake_ip() {
     UNSTAKE_WEI=$(python3 -c "print(int($UNSTAKE_AMOUNT * 1000000000000000000))")  # Ensure integer output
 
     # Unregister the validator using the imported private key
-    story validator withdraw --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
+    story validator unstake --validator-pubkey "VALIDATOR_PUB_KEY" --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
 
     # Wait for 2 minutes (120 seconds) before proceeding
     print_info "Waiting for 2 minutes for the changes to reflect..."
@@ -555,8 +555,11 @@ remove_node() {
 start_nodes() {
     print_info "<================= Start Nodes ================>"
     print_info "Starting Story and Story Geth services..."
-    sudo systemctl start story-geth.service
-    sudo systemctl start story.service
+    sudo systemctl daemon-reload
+    sudo systemctl enable story-geth
+    sudo systemctl enable story
+    sudo systemctl start story-geth
+    sudo systemctl start story
     print_info "Story and Story Geth services started."
     node_management_menu
 }
