@@ -646,14 +646,15 @@ check_balance() {
     # Remove the "0x" prefix
     balance_hex=${balance_hex#0x}
 
-    # Convert hexadecimal balance to decimal using 'printf'
-    local balance_decimal=$(printf "%d\n" "0x$balance_hex")
+    # Convert hexadecimal balance to decimal using 'bc' for larger values
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
 
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
 
     # Convert balance from Wei to IP tokens using awk
     local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
+
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
