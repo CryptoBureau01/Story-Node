@@ -649,6 +649,8 @@ check_balance() {
     # Convert hexadecimal balance to decimal using 'perl'
     local balance_decimal=$(perl -e "print hex('$balance_hex')")
 
+    print_info "Hexadecimal balance : $balance_decimal" 
+
     # Convert balance from Wei to IP tokens and limit to 4 decimal places
     local balance_in_ip=$(echo "scale=4; $balance_decimal / 1000000000000000000" | bc)
 
