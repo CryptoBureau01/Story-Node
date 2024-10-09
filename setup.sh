@@ -651,8 +651,8 @@ check_balance() {
 
     print_info "Hexadecimal balance : $balance_decimal" 
 
-    # Convert balance from Wei to IP tokens and limit to 4 decimal places
-    local balance_in_ip=$(echo "scale=4; $balance_decimal / 1000000000000000000" | bc)
+    # Convert balance from Wei to IP tokens and limit to 18 decimal places
+    local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
