@@ -644,7 +644,10 @@ check_balance() {
     fi
 
     # Convert hexadecimal balance to decimal (remove the "0x" prefix)
-    local balance_decimal=$(printf "%d\n" "$balance_hex")
+    local balance_decimal=$(printf "%d\n" "$((balance_hex))")
+
+    # Debugging: Print the decimal balance
+    print_info "Decimal Balance: $balance_decimal"
 
     # Convert balance from Wei to IP tokens using awk
     local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
@@ -653,9 +656,10 @@ check_balance() {
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
 
-     # Return to node management menu
+    # Return to node management menu
     node_management_menu
 }
+
 
 
 
