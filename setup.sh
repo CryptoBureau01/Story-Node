@@ -23,6 +23,11 @@ ADDRESS_COMMAND="/root/go/bin/story validator export - export-evm-key"
 # Extract the EVM Public Key from the command output
 ADDRESS_KEY=$($ADDRESS_COMMAND | grep "EVM Public Key" | awk '{print $4}')
 
+# Command to get the Base64 Public Key
+BASE64_PUB_KEY=$(curl -s localhost:26657/status | jq -r '.result.validator_info.pub_key.value')
+
+
+
 
 
 # Function to ensure go/bin is in PATH
@@ -507,7 +512,7 @@ unstake_ip() {
     UNSTAKE_WEI=$(python3 -c "print(int($UNSTAKE_AMOUNT * 1000000000000000000))")  # Ensure integer output
 
     # Unregister the validator using the imported private key
-    story validator unstake --validator-pubkey "VALIDATOR_PUB_KEY" --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
+    story validator unstake --validator-pubkey "$BASE64_PUB_KEY" --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
 
     # Wait for 2 minutes (120 seconds) before proceeding
     print_info "Waiting for 2 minutes for the changes to reflect..."
