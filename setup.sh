@@ -646,8 +646,8 @@ check_balance() {
     balance_hex=${balance_hex#0x}
     print_info "Hex Balance (without 0x): $balance_hex"
 
-    # Convert hexadecimal balance to decimal
-    local balance_decimal=$(printf "%d\n" "0x$balance_hex")
+    # Convert hexadecimal balance to decimal using 'bc'
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
 
     # Check if the decimal conversion was successful
     if [[ $? -ne 0 ]]; then
