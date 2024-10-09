@@ -643,8 +643,11 @@ check_balance() {
         return
     fi
 
-    # Convert hexadecimal balance to decimal (remove the "0x" prefix)
-    local balance_decimal=$(printf "%d\n" "$((balance_hex))")
+    # Remove the "0x" prefix
+    balance_hex=${balance_hex#0x}
+
+    # Convert hexadecimal balance to decimal using 'printf'
+    local balance_decimal=$(printf "%d\n" "0x$balance_hex")
 
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
@@ -659,6 +662,7 @@ check_balance() {
     # Return to node management menu
     node_management_menu
 }
+
 
 
 
