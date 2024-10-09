@@ -564,7 +564,7 @@ remove_node() {
 logs_checker() {
     print_info "<================= Logs Checker ================>"
 
-    print_info "Check All Node Logs Like : Geth-Logs, Story-Logs, Sync-Status, Geth-Status, Story-Status
+    print_info "Check All Node Logs Like : Geth-Logs, Story-Logs, Sync-Status, Geth-Status, Story-Status"
 
     print_info "Live Logs File Install...."
     cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/logs.sh && chmod +x logs.sh && ./logs.sh
