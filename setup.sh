@@ -726,9 +726,10 @@ check_private_key() {
 
 # Function to display the Node Management Menu
 node_management_menu() {
-    print_info "<================= Node Management Menu ===============>"
+     print_info "<================= Node Management Menu ===============>"
     
-    options=(
+    # Define options for Part 1 (1-10)
+    options_part1=(
         "Install-Dependencies"
         "Story-Geth Binary Setup"
         "Story Binary Setup"
@@ -739,6 +740,10 @@ node_management_menu() {
         "Start-Node"
         "Logs-Checker"
         "Node-Status"
+    )
+
+    # Define options for Part 2 (11-17)
+    options_part2=(
         "Validator-Info"
         "Private-Key Checker"
         "Balance-Checker"
@@ -748,9 +753,18 @@ node_management_menu() {
         "Exit"
     )
 
-    # Display options with numbers
-    for i in "${!options[@]}"; do
-        echo "$((i + 1)). ${options[$i]}"
+    # Display Part 1 options (1-10) aligned to the right
+    for i in "${!options_part1[@]}"; do
+        printf "%-40s %s\n" "${options_part1[$i]}" "$((i + 1))"
+    done
+
+    # Add a separator line
+    echo "-----------------------------------------------------"
+
+    
+    # Display Part 2 options (11-17) centered
+    for i in "${!options_part2[@]}"; do
+        printf "%-20s %s\n" " " "$((i + 11)). ${options_part2[$i]}"
     done
 
     while true; do
