@@ -726,124 +726,63 @@ check_private_key() {
 
 # Function to display the Node Management Menu
 node_management_menu() {
-     print_info "<================= Node Management Menu ===============>"
-    
-    # Define options for Part 1 (1-10)
-    options_part1=(
-        "Install-Dependencies"
+    print_info "<================= Node Management Menu ===============>"
+
+    # Define the Node and Wallet Menu options
+    node_options=(
+        "Install Dependencies"
         "Story-Geth Binary Setup"
         "Story Binary Setup"
         "Setup Moniker Name"
-        "Update-Peers"
-        "Update-Snapshot"
-        "Stop-Node"
-        "Start-Node"
-        "Logs-Checker"
-        "Node-Status"
+        "Update Peers"
+        "Update Snapshot"
+        "Stop Node"
+        "Start Node"
+        "Logs Checker"
+        "Node Status"
     )
 
-    # Define options for Part 2 (11-17)
-    options_part2=(
-        "Validator-Info"
-        "Private-Key Checker"
-        "Balance-Checker"
-        "Stake-IP"
-        "UnStake-IP"
-        "Remove-Node"
+    wallet_options=(
+        "Validator Info"
+        "Private Key Checker"
+        "Balance Checker"
+        "Stake IP"
+        "Unstake IP"
+        "Remove Node"
         "Exit"
     )
 
-    # Display Part 1 options (1-10) aligned to the right
-    for i in "${!options_part1[@]}"; do
-        printf "%-40s %s\n" "${options_part1[$i]}" "$((i + 1))"
-    done
-
-    # Add a separator line
-    echo "-----------------------------------------------------"
-
-    
-    # Display Part 2 options (11-17) centered
-    for i in "${!options_part2[@]}"; do
-        printf "%-20s %s\n" " " "$((i + 11)). ${options_part2[$i]}"
+    # Display Node Menu and Wallet Menu
+    echo "    Node Menu                                                          Wallet Menu"
+    for i in "${!node_options[@]}"; do
+        printf "%d.%-60s %s%d. %s\n" "$((i + 1))" "${node_options[$i]}" "$((i + 11))" "${wallet_options[$i]}"
     done
 
     while true; do
-        read -p "Please select an option (1-17): " choice
+        read -p "Please select an option (1-16): " choice
         case $choice in
-            1)
-                print_info "You selected to install dependencies."
-                install_dependencies  # Call the function here
-                ;;
-            2)
-                print_info "You selected Story-Geth Binary Setup."
-                setup_story_geth  # Call the Story-Geth setup function
-                ;;
-            3)
-                print_info "You selected Story Binary Setup."
-                setup_story_binary  # Call the Story binary setup function
-                ;;
-            4)
-                print_info "You selected to setup Moniker Name."
-                setup_moniker_name  # Call the setup moniker function
-                ;;
-            5)
-                print_info "You selected to update peers."
-                update_peers  # Call the update peers function
-                ;;
-            6)
-                print_info "You selected to update snapshot."
-                update_snapshot  # Call the update snapshot function
-                ;;
-            7)
-                print_info "You selected to stop the node."
-                stop_nodes  # Call the stop node function
-                ;;
-            8)
-                print_info "You selected to start the node."
-                start_nodes  # Call the start node function
-                ;;
-            9)
-                print_info "You selected Logs Checker."
-                logs_checker  # Call the Logs Checker function
-                ;;
-            10)
-                print_info "Starting the node status check..."
-                check_node_status # Call the Node Status function
-                ;;
-            11)
-                print_info "Check Your Validator Info"
-                show_validator_info  # Call the Validator Info function
-                ;;
-            12)
-                print_info "Check Your Private Key."
-                check_private_key  # Call the Private Key Checker function
-                ;;
-            13)
-                print_info "Check Your Account Balance."
-                check_balance  # Call the Account Balance Checker function
-                ;;
-            14)
-                print_info "You selected to stake IP."
-                stake_ip  # Call the stake IP function
-                ;;
-            15)
-                print_info "You selected to unstake IP."
-                unstake_ip  # Call the unstake IP function
-                ;;
-            16)
-                print_info "You selected to remove the node."
-                remove_node  # Call the remove node function
-                ;;
-            17)
-                print_info "Exiting the script."
-                exit 0  # Exit the script after breaking the loop
-                ;;
-            *)
-                print_info "Invalid option, please select a number between 1 and 17." 
-                ;;
+            1) print_info "You selected to install dependencies."; install_dependencies ;;
+            2) print_info "You selected Story-Geth Binary Setup."; setup_story_geth ;;
+            3) print_info "You selected Story Binary Setup."; setup_story_binary ;;
+            4) print_info "You selected to setup Moniker Name."; setup_moniker_name ;;
+            5) print_info "You selected to update peers."; update_peers ;;
+            6) print_info "You selected to update snapshot."; update_snapshot ;;
+            7) print_info "You selected to stop the node."; stop_nodes ;;
+            8) print_info "You selected to start the node."; start_nodes ;;
+            9) print_info "You selected Logs Checker."; logs_checker ;;
+            10) print_info "Starting the node status check..."; check_node_status ;;
+            11) print_info "Check Your Validator Info"; show_validator_info ;;
+            12) print_info "Check Your Private Key"; check_private_key ;;
+            13) print_info "Check Your Account Balance"; check_balance ;;
+            14) print_info "You selected to stake IP"; stake_ip ;;
+            15) print_info "You selected to unstake IP"; unstake_ip ;;
+            16) print_info "You selected to remove the node"; remove_node ;;
+            17) print_info "Exiting the script"; exit 0 ;;
+            *) print_info "Invalid option, please select a number between 1 and 17"; ;;
         esac
     done
 }
+
 
 # Call the Node Management Menu function
 node_management_menu
