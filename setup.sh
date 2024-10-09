@@ -621,7 +621,6 @@ print_info "<================= Show Validator Info ===============>"
 # Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
-    print_info "EVM Address: $ADDRESS_KEY"
 
     # Fetch the balance using the EVM address
     local balance_response=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
@@ -630,9 +629,6 @@ check_balance() {
         "params": ["'$ADDRESS_KEY'", "latest"],
         "id": 1
     }')
-
-    # Print the raw balance response for debugging
-    print_info "Raw balance response: $balance_response"
 
     # Extract the balance from the JSON response (in hex)
     local balance_hex=$(echo $balance_response | jq -r '.result')
@@ -645,7 +641,6 @@ check_balance() {
 
     # Remove the "0x" prefix
     balance_hex=${balance_hex#0x}
-    print_info "Hex Balance (without 0x): $balance_hex"
 
     # Debugging: Check if balance_hex is valid
     if ! [[ $balance_hex =~ ^[0-9a-fA-F]+$ ]]; then
@@ -661,9 +656,6 @@ check_balance() {
         print_info "Error converting balance from hex to decimal."
         return
     fi
-
-    # Debugging: Print the decimal balance
-    print_info "Decimal Balance: $balance_decimal"
 
     # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei)
     local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
