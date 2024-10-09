@@ -646,9 +646,16 @@ check_balance() {
     balance_hex=${balance_hex#0x}
     print_info "Hex Balance (without 0x): $balance_hex"
 
-    # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
+    # Debugging: Check if balance_hex is valid
+    if ! [[ $balance_hex =~ ^[0-9a-fA-F]+$ ]]; then
+        print_info "Invalid hexadecimal balance format."
+        return
+    fi
 
+    # Convert hexadecimal balance to decimal using 'bc'
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>&1)
+
+    
     # Check if the decimal conversion was successful
     if [[ $? -ne 0 ]]; then
         print_info "Error converting balance from hex to decimal. Input was: 0x$balance_hex"
