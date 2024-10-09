@@ -225,29 +225,38 @@ setup_story_binary() {
     # Source the .bash_profile to update the current session
     source "$HOME/.bash_profile"
 
-    # Download and install Story v0.10.1
-    print_info "Downloading and installing Story v0.10.1..."
-    cd "$HOME" || exit 1
-    if ! wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.10.1-57567e5.tar.gz; then
-        print_error "Failed to download Story binary"
-        exit 1
-    fi
+    # Download and extract the Story v0.11.0 binary
+      print_info "Downloading Story v0.11.0..."
+       cd $HOME
+       if ! wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/story-public/story-linux-amd64-0.11.0-aac4bfe.tar.gz; then
+          print_error "Failed to download Story binary"
+          exit 1
+       fi
+
     print_info "Successfully downloaded Story binary."
 
-    # Extract Story v0.10.1 binary
-    print_info "Extracting Story v0.10.1..."
-    if ! tar -xzvf story-linux-amd64-0.10.1-57567e5.tar.gz; then
-        print_error "Failed to extract Story binary"
-        exit 1
-    fi
+    # Unzip Story v0.11.0 binary
+      print_info "Extracting Story v0.11.0..."
+       if ! tar -xzf story-linux-amd64-0.11.0-aac4bfe.tar.gz; then
+            print_error "Failed to extract Story binary"
+            exit 1
+      fi
     print_info "Successfully extracted Story binary."
 
-    # Move Story binary to go/bin and make it executable
-    print_info "Moving Story binary to go/bin..."
-    if ! mv story-linux-amd64-0.10.1-57567e5/story "$HOME/go/bin/story"; then
-        print_error "Failed to move Story binary"
-        exit 1
-    fi
+    # Replace the Old Binary with the New One in go/bin
+      print_info "Replacing the old binary with the new one in $HOME/go/bin..."
+      if ! sudo cp story-linux-amd64-0.11.0-aac4bfe/story $HOME/go/bin; then
+          print_error "Failed to replace the binary in $HOME/go/bin"
+          exit 1
+      fi
+
+    # Replace the Old Binary with the New One in /usr/local/bin
+      print_info "Replacing the old binary with the new one in /usr/local/bin..."
+        if ! sudo cp story-linux-amd64-0.11.0-aac4bfe/story /usr/local/bin; then
+           print_error "Failed to replace the binary in /usr/local/bin"
+           exit 1
+        fi
+
 
     # Make the binary executable
     print_info "Making the binary executable..."
@@ -265,10 +274,10 @@ setup_story_binary() {
 
     # Cleanup
     print_info "Cleaning up downloaded files..."
-    rm -f /root/story-linux-amd64-0.10.1-57567e5.tar.gz
-    rm -rf /root/story-linux-amd64-0.10.1-57567e5
+    rm -f /root/story-linux-amd64-0.11.0-aac4bfe.tar.gz
+    rm -rf /root/story-linux-amd64-0.11.0-aac4bfe
 
-    print_info "Story has been successfully updated to version 0.10.1!"
+    print_info "Story has been successfully updated to version 0.11.0!"
 
     # Return to node management menu
     node_management_menu
