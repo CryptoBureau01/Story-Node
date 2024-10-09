@@ -396,6 +396,10 @@ update_snapshot() {
 
     print_info "Snapshots applied successfully!"
 
+    # Delete the update-snapshots.sh file after execution
+    print_info "Deleting update-snapshots.sh file..."
+    rm -f update-snapshots.sh
+    
     # Return to node management menu
     node_management_menu
 }
@@ -556,6 +560,28 @@ remove_node() {
 
 
 
+# Function to update snapshot
+logs_checker() {
+    print_info "<================= Logs Checker ================>"
+
+    print_info "Check All Node Logs Like : Geth-Logs, Story-Logs, Sync-Status, Geth-Status, Story-Status
+
+    print_info "Live Logs File Install...."
+    cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/logs.sh && chmod +x logs.sh && ./logs.sh
+
+    print_info "Logs applied successfully!"
+
+    # Delete the logs.sh file after execution
+    print_info "Deleting logs.sh file..."
+    rm -f logs.sh
+    
+    # Return to node management menu
+    node_management_menu
+}
+
+
+
+
 # Function to start nodes
 start_nodes() {
     print_info "<================= Start Nodes ================>"
@@ -711,6 +737,7 @@ node_management_menu() {
         "Update-Snapshot"
         "Stop-Node"
         "Start-Node"
+        "Logs-Checker"
         "Node-Status"
         "Validator-Info"
         "Private-Key Checker"
@@ -762,34 +789,38 @@ node_management_menu() {
                 start_nodes  # Call the start node function
                 ;;
             9)
+               print_info "You selected to Logs Checker."
+                logs_checker  # Call the start node function
+                ;;
+            10)
                 print_info "Starting the node status check..."
                 check_node_status # Call the Node Status function
                 ;;
-            10)
+            11)
                 print_info "Check Your Validator Info"
                 show_validator_info  # Call the Validator Info function
                 ;;
-            11)
+            12)
                 print_info "Check Your Private Key."
                 check_private_key  # Call the Private Key Checker function
                 ;;
-            12)
+            13)
                 print_info "Check Your Account Balance Check!."
                 check_balance  # Call the Account Balance Checker function
                 ;;
-            13)
+            14)
                 print_info "You selected to stake IP."
                 stake_ip  # Call the stake IP function
                 ;;
-            14)
+            15)
                 print_info "You selected to unstake IP."
                 unstake_ip  # Call the unstake IP function
                 ;;
-            15)
+            16)
                 print_info "You selected to remove the node."
                 remove_node  # Call the remove node function
                 ;;
-            16)
+            17)
                 print_info "Exiting the script."
                 break
                 ;;
