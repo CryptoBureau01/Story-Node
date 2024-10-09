@@ -440,7 +440,7 @@ stake_ip() {
     fi
 
     # Convert stake amount to Wei (1 IP = 10^18 Wei)
-    STAKE_WEI=$(awk "BEGIN {printf \"%d\", $STAKE_AMOUNT * 1000000000000000000}")  # Ensure integer output
+    STAKE_WEI=$(python3 -c "print(int($STAKE_AMOUNT * 1000000000000000000))")  # Ensure integer output
 
 
     # Register the validator using the imported private key
@@ -504,7 +504,7 @@ unstake_ip() {
     fi
 
     # Convert stake amount to Wei (1 IP = 10^18 Wei)
-    UNSTAKE_WEI=$(awk "BEGIN {printf \"%d\", $UNSTAKE_AMOUNT * 1000000000000000000}")  # Ensure integer output
+    UNSTAKE_WEI=$(python3 -c "print(int($UNSTAKE_AMOUNT * 1000000000000000000))")  # Ensure integer output
 
     # Unregister the validator using the imported private key
     story validator withdraw --unstake "$UNSTAKE_WEI" --private-key "$PRIVATE_KEY"
@@ -626,7 +626,6 @@ print_info "<================= Show Validator Info ===============>"
 
 
 # Function to check balance
-# Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
 
@@ -641,21 +640,16 @@ check_balance() {
     # Extract the balance from the JSON response (in hex)
     local balance_hex=$(echo $balance_response | jq -r '.result' | sed 's/^0x//')
 
-    # Check if the balance was retrieved and is a valid hexadecimal
-    if [[ -z "$balance_hex" || ! "$balance_hex" =~ ^[0-9a-fA-F]+$ ]]; then
-        print_info "Invalid balance format or address."
-        return
-    fi
+    # Convert the hexadecimal balance to decimal using Python
+    balance_decimal=$(python3 -c "print(int('$balance_hex', 16))")
 
-    # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
+    # Convert decimal balance to IP balance (assuming 1 IP = 1e18)
+    balance_in_ip=$(python3 -c "print(f'{${balance_decimal}/1000000000000000000:.4f}')")
 
-    # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei) and limit to 4 decimal places
-    local balance_in_ip=$(echo "scale=4; $balance_decimal / 1000000000000000000" | bc)
-
-    # Print the balance information
-    print_info "Address: $ADDRESS_KEY"
+    # Print the formatted balance
+    print_info "EVM Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
+
 
     # Return to node management menu
     node_management_menu
