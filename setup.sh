@@ -617,9 +617,9 @@ print_info "<================= Show Validator Info ===============>"
 
 
 
+# Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
-    print_info "Private Key: $PRIVATE_KEY"
     print_info "EVM Address: $ADDRESS_KEY"
 
     # Fetch the balance using the EVM address
@@ -633,38 +633,32 @@ check_balance() {
     # Print the raw balance response for debugging
     print_info "Raw balance response: $balance_response"
 
-    # Extract the balance from the response (in hex)
+    # Extract the balance from the JSON response (in hex)
     local balance_hex=$(echo $balance_response | jq -r '.result')
 
     # Check if the balance was retrieved successfully
     if [[ "$balance_hex" == "null" || -z "$balance_hex" ]]; then
         print_info "Unable to retrieve balance. Please check the address."
-        node_management_menu
         return
     fi
 
     # Remove the "0x" prefix
     balance_hex=${balance_hex#0x}
 
-    # Convert hexadecimal balance to decimal using 'bc' for larger values
+    # Convert hexadecimal balance to decimal using 'bc'
     local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
 
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
 
-    # Check if balance_decimal is valid before proceeding
-    if [[ -n "$balance_decimal" && "$balance_decimal" =~ ^[0-9]+$ ]]; then
-        # Convert balance from Wei to IP tokens using awk
-        local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
+    # Convert balance from Wei to IP tokens using awk
+    local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
 
-        # Print the balance information
-        print_info "Address: $ADDRESS_KEY"
-        print_info "Balance: $balance_in_ip IP"
-    else
-        print_info "Failed to convert balance to decimal."
-    fi
+    # Print the balance information
+    print_info "Address: $ADDRESS_KEY"
+    print_info "Balance: $balance_in_ip IP"
 
-    # Return to node management menu
+     # Return to node management menu
     node_management_menu
 }
 
