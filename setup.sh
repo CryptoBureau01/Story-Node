@@ -644,6 +644,7 @@ check_balance() {
 
     # Remove the "0x" prefix
     balance_hex=${balance_hex#0x}
+    print_info "Hex Balance (without 0x): $balance_hex"
 
     # Convert hexadecimal balance to decimal using 'bc'
     local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>/dev/null)
@@ -669,7 +670,7 @@ check_balance() {
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
-
+    
      # Return to node management menu
     node_management_menu
 }
