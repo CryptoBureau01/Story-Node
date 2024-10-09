@@ -107,7 +107,7 @@ if [ "$snapshot_choice" == "1" ]; then
     # Download the new Geth snapshot
     print_info "Downloading the Geth snapshot..."
     cd $HOME
-    if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
+    if ! wget -O geth_snapshot.lz4 https://snapshots2.mandragora.io/story/geth_snapshot.lz4; then
         print_error "Failed to download Geth snapshot"
         exit 1
     fi
@@ -137,7 +137,7 @@ elif [ "$snapshot_choice" == "2" ]; then
 
     # Download the new Story snapshot
     print_info "Downloading the Story snapshot..."
-    if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
+    if ! wget -O story_snapshot.lz4 https://snapshots2.mandragora.io/story/story_snapshot.lz4; then
         print_error "Failed to download Story snapshot"
         exit 1
     fi
