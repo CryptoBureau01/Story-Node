@@ -890,13 +890,13 @@ node_management_menu() {
                 ;;
             17)
                 print_info "You selected to Full Backup node."
-                full_backup  # Call the remove node function
-                ;;
-            18)
-                print_info "You selected to remove the node."
                 restore_backup  # Call the remove node function
                 ;;
             18)
+                print_info "You selected to remove the node."
+                remove_node  # Call the remove node function
+                ;;
+            19)
                 print_info "Exiting the script."
                 exit 0  # Exit the script after breaking the loop
                 ;;
