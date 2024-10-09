@@ -653,8 +653,8 @@ check_balance() {
         return
     fi
 
-    # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>/dev/null)
+    # Convert hexadecimal balance to decimal using 'perl'
+    local balance_decimal=$(perl -e "print hex('$balance_hex')")
 
     # Check if the decimal conversion was successful
     if [[ $? -ne 0 || -z "$balance_decimal" ]]; then
