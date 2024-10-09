@@ -768,7 +768,9 @@ remove_node() {
 
     # Node removal section
     read -p "Are you sure you want to remove the node? Type 'Yes' to confirm or 'No' to cancel: " confirmation
-    if [[ "$confirmation" == "Yes" ]]; then
+    confirmation=$(echo "$confirmation" | tr '[:upper:]' '[:lower:]')  # Convert input to lowercase
+
+    if [[ "$confirmation" == "yes" ]]; then
         print_info "Removing Node..."
         sudo systemctl stop story-geth
         sudo systemctl stop story
