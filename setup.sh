@@ -617,7 +617,6 @@ print_info "<================= Show Validator Info ===============>"
 
 
 
-
 # Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
@@ -631,58 +630,31 @@ check_balance() {
     }')
 
     # Extract the balance from the JSON response (in hex)
-    local balance_hex=$(echo $balance_response | jq -r '.result')
+    local balance_hex=$(echo $balance_response | jq -r '.result' | sed 's/^0x//')
 
-    # Check if the balance was retrieved successfully
-    if [[ "$balance_hex" == "null" || -z "$balance_hex" ]]; then
-        print_info "Unable to retrieve balance. Please check the address."
-        return
-    fi
-
-    # Remove the "0x" prefix
-    balance_hex=${balance_hex#0x}
-
-    # Debugging: Check if balance_hex is valid
-    if ! [[ $balance_hex =~ ^[0-9a-fA-F]+$ ]]; then
-        print_info "Invalid hexadecimal balance format."
+    # Check if the balance was retrieved and is a valid hexadecimal
+    if [[ -z "$balance_hex" || ! "$balance_hex" =~ ^[0-9a-fA-F]+$ ]]; then
+        print_info "Invalid balance format or address."
         return
     fi
 
     # Convert hexadecimal balance to decimal using 'perl'
     local balance_decimal=$(perl -e "print hex('$balance_hex')")
 
-    # Check if the decimal conversion was successful
-    if [[ $? -ne 0 || -z "$balance_decimal" ]]; then
-        print_info "Error converting balance from hex to decimal."
-        return
-    fi
-
-    # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei)
-    local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
-
-    # Check if balance_in_ip is a number
-    if ! [[ $balance_in_ip =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-        print_info "Error: Invalid balance value."
-        return
-    fi
+    # Convert balance from Wei to IP tokens and limit to 4 decimal places
+    local balance_in_ip=$(echo "scale=4; $balance_decimal / 1000000000000000000" | bc)
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
 
-    # Return to node management menu
+     # Return to node management menu
     node_management_menu
 }
 
 
 
-
-
-
-
-
-
-
+# Function to check Private key
 check_private_key() {
     print_info "<================= Private Key ===============>"
 
