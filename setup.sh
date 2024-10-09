@@ -617,6 +617,7 @@ print_info "<================= Show Validator Info ===============>"
 
 
 
+
 # Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
@@ -653,20 +654,19 @@ check_balance() {
     fi
 
     # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>&1)
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>/dev/null)
 
-    
     # Check if the decimal conversion was successful
-    if [[ $? -ne 0 ]]; then
-        print_info "Error converting balance from hex to decimal. Input was: 0x$balance_hex"
+    if [[ $? -ne 0 || -z "$balance_decimal" ]]; then
+        print_info "Error converting balance from hex to decimal."
         return
     fi
 
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
-    
+
     # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei)
-    local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc 2>/dev/null)
+    local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
 
     # Check if balance_in_ip is a number
     if ! [[ $balance_in_ip =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
@@ -677,10 +677,11 @@ check_balance() {
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
-    
-     # Return to node management menu
+
+    # Return to node management menu
     node_management_menu
 }
+
 
 
 
