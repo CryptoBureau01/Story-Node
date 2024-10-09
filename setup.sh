@@ -646,7 +646,7 @@ check_balance() {
     balance_hex=${balance_hex#0x}
 
     # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>/dev/null)
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
 
     # Check if the decimal conversion was successful
     if [[ $? -ne 0 ]]; then
@@ -659,6 +659,12 @@ check_balance() {
 
     # Convert balance from Wei to IP tokens
     local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
+
+    # Check if balance_in_ip is a number
+    if ! [[ $balance_in_ip =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+        print_info "Error: Invalid balance value."
+        return
+    fi
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
