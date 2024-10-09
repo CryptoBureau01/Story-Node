@@ -652,13 +652,17 @@ check_balance() {
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
 
-    # Convert balance from Wei to IP tokens using awk
-    local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
+    # Check if balance_decimal is valid before proceeding
+    if [[ -n "$balance_decimal" && "$balance_decimal" =~ ^[0-9]+$ ]]; then
+        # Convert balance from Wei to IP tokens using awk
+        local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
 
-
-    # Print the balance information
-    print_info "Address: $ADDRESS_KEY"
-    print_info "Balance: $balance_in_ip IP"
+        # Print the balance information
+        print_info "Address: $ADDRESS_KEY"
+        print_info "Balance: $balance_in_ip IP"
+    else
+        print_info "Failed to convert balance to decimal."
+    fi
 
     # Return to node management menu
     node_management_menu
