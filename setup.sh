@@ -531,35 +531,6 @@ unstake_ip() {
 }
 
 
-
-remove_node() {
-    print_info "<================= Remove Node ================>"
-
-    # Node removal section
-    read -p "Are you sure you want to remove the node? Type 'Yes' to confirm or 'No' to cancel: " confirmation
-    if [[ "$confirmation" == "Yes" ]]; then
-        print_info "Removing Node..."
-        sudo systemctl stop story-geth
-        sudo systemctl stop story
-        sudo systemctl disable story-geth
-        sudo systemctl disable story
-        sudo rm /etc/systemd/system/story-geth.service
-        sudo rm /etc/systemd/system/story.service
-        sudo systemctl daemon-reload
-        sudo rm -rf $HOME/.story
-        sudo rm $HOME/go/bin/story-geth
-        sudo rm $HOME/go/bin/story
-        print_info "Node successfully removed!"
-    else
-        print_info "Node removal canceled."
-    fi
-
-    # Return to node management menu
-    node_management_menu
-}
-
-
-
 # Function to update snapshot
 logs_checker() {
     print_info "<================= Logs Checker ================>"
@@ -578,7 +549,6 @@ logs_checker() {
     # Return to node management menu
     node_management_menu
 }
-
 
 
 
@@ -724,6 +694,102 @@ check_private_key() {
 }
 
 
+# Full Backup Function
+full_backup() {
+    print_info "<================= Full Backup ===============>"
+
+    # Backup Create Directory
+    print_info "Creating backup directory..."
+    mkdir -p /root/.story_backup
+
+    # Story Backup Create Directory
+    print_info "Creating Story backup directory..."
+    mkdir -p /root/.story_backup/story/data
+
+    # Geth Backup Create Directory
+    print_info "Creating Geth backup directory..."
+    mkdir -p /root/.story_backup/geth/iliad/geth
+
+    # Backup Directory File save
+    print_info "Backing up priv_validator_state.json.backup..."
+    sudo cp /root/.story/priv_validator_state.json.backup /root/.story_backup
+
+    # Story Backup Directory File save
+    print_info "Backing up Story configuration and data..."
+    sudo cp -r /root/.story/story/config /root/.story_backup/story
+    sudo cp -r /root/.story/story/cosmovisor /root/.story_backup/story
+    sudo cp /root/.story/story/data/priv_validator_state.json /root/.story_backup/story/data
+
+    # Geth Backup Directory File save
+    print_info "Backing up Geth files..."
+    sudo cp -r /root/.story/geth/geth /root/.story_backup/geth
+    sudo cp /root/.story/geth/iliad/geth/nodekey /root/.story_backup/geth/iliad/geth
+    sudo cp /root/.story/geth/iliad/geth/jwtsecret /root/.story_backup/geth/iliad/geth
+    sudo cp -r /root/.story/geth/iliad/geth/blobpool /root/.story_backup/geth/iliad/geth
+
+    print_info "Backup completed successfully!"
+
+    # Return to node management menu
+    node_management_menu    
+}
+
+
+# Restore Backup Function
+restore_backup() {
+    print_info "<================= Restore Backup ===============>"
+
+    # Restore priv_validator_state.json.backup
+    print_info "Restoring priv_validator_state.json.backup..."
+    sudo cp /root/.story_backup/priv_validator_state.json.backup /root/.story/
+
+    # Restore Story configuration and data
+    print_info "Restoring Story configuration and data..."
+    sudo cp -r /root/.story_backup/story/config /root/.story/story/
+    sudo cp -r /root/.story_backup/story/cosmovisor /root/.story/story/
+    sudo cp /root/.story_backup/story/data/priv_validator_state.json /root/.story/story/data/
+
+    # Restore Geth files
+    print_info "Restoring Geth files..."
+    sudo cp -r /root/.story_backup/geth/geth /root/.story/geth/
+    sudo cp /root/.story_backup/geth/iliad/geth/nodekey /root/.story/geth/iliad/geth/
+    sudo cp /root/.story_backup/geth/iliad/geth/jwtsecret /root/.story/geth/iliad/geth/
+    sudo cp -r /root/.story_backup/geth/iliad/geth/blobpool /root/.story/geth/iliad/geth/
+
+    print_info "Restore completed successfully!"
+
+    # Return to node management menu
+    node_management_menu    
+}
+
+
+
+remove_node() {
+    print_info "<================= Remove Node ================>"
+
+    # Node removal section
+    read -p "Are you sure you want to remove the node? Type 'Yes' to confirm or 'No' to cancel: " confirmation
+    if [[ "$confirmation" == "Yes" ]]; then
+        print_info "Removing Node..."
+        sudo systemctl stop story-geth
+        sudo systemctl stop story
+        sudo systemctl disable story-geth
+        sudo systemctl disable story
+        sudo rm /etc/systemd/system/story-geth.service
+        sudo rm /etc/systemd/system/story.service
+        sudo systemctl daemon-reload
+        sudo rm -rf $HOME/.story
+        sudo rm $HOME/go/bin/story-geth
+        sudo rm $HOME/go/bin/story
+        print_info "Node successfully removed!"
+    else
+        print_info "Node removal canceled."
+    fi
+
+    # Return to node management menu
+    node_management_menu
+}
+
+
 # Function to display the Node Management Menu
 node_management_menu() {
     print_info "<================= Node Management Menu ===============>"
@@ -744,6 +810,8 @@ node_management_menu() {
         "Balance-Checker"
         "Stake-IP"
         "UnStake-IP"
+        "Full-Backup"
+        "Restore-Backup"
         "Remove-Node"
         "Exit"
     )
@@ -754,7 +822,7 @@ node_management_menu() {
     done
 
     while true; do
-        read -p "Please select an option (1-17): " choice
+        read -p "Please select an option (1-18): " choice
          case $choice in
             1)
                 print_info "You selected to install dependencies."
@@ -817,10 +885,18 @@ node_management_menu() {
                 unstake_ip  # Call the unstake IP function
                 ;;
             16)
-                print_info "You selected to remove the node."
-                remove_node  # Call the remove node function
+                print_info "You selected to Full Backup node."
+                full_backup  # Call the remove node function
                 ;;
             17)
+                print_info "You selected to Full Backup node."
+                full_backup  # Call the remove node function
+                ;;
+            18)
+                print_info "You selected to remove the node."
+                restore_backup  # Call the remove node function
+                ;;
+            18)
                 print_info "Exiting the script."
                 exit 0  # Exit the script after breaking the loop
                 ;;
