@@ -619,41 +619,41 @@ print_info "<================= Show Validator Info ===============>"
 
 check_balance() {
     print_info "<================= Balance Checker ===============>"
-
-    # Debugging: Print the private key and address
     print_info "Private Key: $PRIVATE_KEY"
     print_info "EVM Address: $ADDRESS_KEY"
 
-    # Check if the private key file exists
-    if [[ -f "$PRIVATE_KEY_PATH" ]]; then
-        # Fetch the balance using the EVM address
-        local balance=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
-            "jsonrpc": "2.0",
-            "method": "eth_getBalance",
-            "params": ["'$ADDRESS_KEY'", "latest"],
-            "id": 1
-        }' | jq -r '.result')
+    # Fetch the balance using the EVM address
+    local balance_response=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
+        "jsonrpc": "2.0",
+        "method": "eth_getBalance",
+        "params": ["'$ADDRESS_KEY'", "latest"],
+        "id": 1
+    }')
 
-        # Check if the balance was retrieved successfully
-        if [[ "$balance" == "null" || -z "$balance" ]]; then
-            print_info "Unable to retrieve balance. Please check the address."
-            node_management_menu
-            return
-        fi
+    # Print the raw balance response for debugging
+    print_info "Raw balance response: $balance_response"
 
-        # Convert balance from Wei to IP tokens using awk
-        local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance / 1000000000000000000}")
+    # Extract the balance from the response
+    local balance=$(echo $balance_response | jq -r '.result')
 
-        # Print the balance information
-        print_info "Address: $ADDRESS_KEY"
-        print_info "Balance: $balance_in_ip IP"
-    else
-        print_info "Private key file does not exist. Please check the path: $PRIVATE_KEY_PATH"
+    # Check if the balance was retrieved successfully
+    if [[ "$balance" == "null" || -z "$balance" ]]; then
+        print_info "Unable to retrieve balance. Please check the address."
+        node_management_menu
+        return
     fi
 
-    # Return to node management menu
+    # Convert balance from Wei to IP tokens using awk
+    local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance / 1000000000000000000}")
+
+    # Print the balance information
+    print_info "Address: $ADDRESS_KEY"
+    print_info "Balance: $balance_in_ip IP"
+
+   # Return to node management menu
     node_management_menu
 }
+
 
 
 
