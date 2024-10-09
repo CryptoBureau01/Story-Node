@@ -626,6 +626,7 @@ print_info "<================= Show Validator Info ===============>"
 
 
 # Function to check balance
+# Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
 
@@ -646,17 +647,17 @@ check_balance() {
         return
     fi
 
-    # Convert hexadecimal balance to decimal using 'perl'
-    local balance_decimal=$(perl -Mbigint -e "print bigint(hex('$balance_hex'))")
+    # Convert hexadecimal balance to decimal using 'bc'
+    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc)
 
-    # Convert balance from Wei to IP tokens in the same Perl command
-    local balance_in_ip=$(perl -Mbigfloat -e "printf('%.18f', bigint(hex('$balance_hex')) / 1000000000000000000)")
+    # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei) and limit to 4 decimal places
+    local balance_in_ip=$(echo "scale=4; $balance_decimal / 1000000000000000000" | bc)
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
 
-     # Return to node management menu
+    # Return to node management menu
     node_management_menu
 }
 
