@@ -633,26 +633,30 @@ check_balance() {
     # Print the raw balance response for debugging
     print_info "Raw balance response: $balance_response"
 
-    # Extract the balance from the response
-    local balance=$(echo $balance_response | jq -r '.result')
+    # Extract the balance from the response (in hex)
+    local balance_hex=$(echo $balance_response | jq -r '.result')
 
     # Check if the balance was retrieved successfully
-    if [[ "$balance" == "null" || -z "$balance" ]]; then
+    if [[ "$balance_hex" == "null" || -z "$balance_hex" ]]; then
         print_info "Unable to retrieve balance. Please check the address."
         node_management_menu
         return
     fi
 
+    # Convert hexadecimal balance to decimal (remove the "0x" prefix)
+    local balance_decimal=$(printf "%d\n" "$balance_hex")
+
     # Convert balance from Wei to IP tokens using awk
-    local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance / 1000000000000000000}")
+    local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance_decimal / 1000000000000000000}")
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
     print_info "Balance: $balance_in_ip IP"
 
-   # Return to node management menu
+     # Return to node management menu
     node_management_menu
 }
+
 
 
 
