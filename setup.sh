@@ -66,7 +66,7 @@ install_dependencies() {
 
     # Update package lists and install general dependencies
     echo "Updating package lists and installing dependencies..."
-    if ! sudo apt update && sudo apt-get upgrade -y && sudo apt install curl git make jq build-essential gcc unzip wget lz4 aria2 pv -y; then
+    if ! sudo apt update && sudo apt-get upgrade -y && sudo yum install bc && sudo apt install curl git make jq bc build-essential gcc unzip wget lz4 aria2 pv -y; then
         print_error "Failed to install dependencies. Please check the logs."
         exit 1
     fi
@@ -647,12 +647,10 @@ check_balance() {
     fi
 
     # Convert hexadecimal balance to decimal using 'perl'
-    local balance_decimal=$(perl -e "print hex('$balance_hex')")
+    local balance_decimal=$(perl -Mbigint -e "print bigint(hex('$balance_hex'))")
 
-    print_info "Hexadecimal balance : $balance_decimal" 
-
-    # Convert balance from Wei to IP tokens and limit to 18 decimal places
-    local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc)
+    # Convert balance from Wei to IP tokens in the same Perl command
+    local balance_in_ip=$(perl -Mbigfloat -e "printf('%.18f', bigint(hex('$balance_hex')) / 1000000000000000000)")
 
     # Print the balance information
     print_info "Address: $ADDRESS_KEY"
