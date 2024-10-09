@@ -616,7 +616,6 @@ print_info "<================= Show Validator Info ===============>"
 
 
 
-
 # Function to check balance
 check_balance() {
     print_info "<================= Balance Checker ===============>"
@@ -661,7 +660,7 @@ check_private_key() {
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
         # Print the private key directly
-        echo "Private key: $PRIVATE_KEY"
+        print_info "Private key: $PRIVATE_KEY"
 
         # Check if the private key is empty
         if [[ -z "$PRIVATE_KEY" ]]; then
@@ -675,7 +674,7 @@ check_private_key() {
             return 1
         fi
 
-        echo "Private key is valid."
+        print_info "Private key is valid."
         return 0
     else
         echo "Private key file does not exist at path: $PRIVATE_KEY_PATH"
@@ -683,12 +682,11 @@ check_private_key() {
     fi
 
     # Return to node management menu
-    node_management_menu
-    
+    node_management_menu    
 }
 
 
-    # Function to display the Node Management Menu
+# Function to display the Node Management Menu
 node_management_menu() {
     print_info "<================= Node Management Menu ===============>"
     
