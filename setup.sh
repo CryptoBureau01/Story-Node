@@ -646,18 +646,18 @@ check_balance() {
     balance_hex=${balance_hex#0x}
     print_info "Hex Balance (without 0x): $balance_hex"
 
-    # Convert hexadecimal balance to decimal using 'bc'
-    local balance_decimal=$(echo "ibase=16; $balance_hex" | bc 2>/dev/null)
+    # Convert hexadecimal balance to decimal
+    local balance_decimal=$(printf "%d\n" "0x$balance_hex")
 
     # Check if the decimal conversion was successful
     if [[ $? -ne 0 ]]; then
-        print_info "Error converting balance from hex to decimal."
+        print_info "Error converting balance from hex to decimal. Input was: 0x$balance_hex"
         return
     fi
 
     # Debugging: Print the decimal balance
     print_info "Decimal Balance: $balance_decimal"
-
+    
     # Convert balance from Wei to IP tokens (1 IP = 10^18 Wei)
     local balance_in_ip=$(echo "scale=18; $balance_decimal / 1000000000000000000" | bc 2>/dev/null)
 
