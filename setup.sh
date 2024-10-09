@@ -743,7 +743,7 @@ node_management_menu() {
         "Private-Key Checker"
         "Balance-Checker"
         "Stake-IP"
-        "unStake-IP"
+        "UnStake-IP"
         "Remove-Node"
         "Exit"
     )
@@ -785,12 +785,12 @@ node_management_menu() {
                 stop_nodes  # Call the stop node function
                 ;;
             8)
-               print_info "You selected to start the node."
+                print_info "You selected to start the node."
                 start_nodes  # Call the start node function
                 ;;
             9)
-               print_info "You selected to Logs Checker."
-                logs_checker  # Call the start node function
+                print_info "You selected Logs Checker."
+                logs_checker  # Call the Logs Checker function
                 ;;
             10)
                 print_info "Starting the node status check..."
@@ -805,7 +805,7 @@ node_management_menu() {
                 check_private_key  # Call the Private Key Checker function
                 ;;
             13)
-                print_info "Check Your Account Balance Check!."
+                print_info "Check Your Account Balance."
                 check_balance  # Call the Account Balance Checker function
                 ;;
             14)
@@ -822,10 +822,10 @@ node_management_menu() {
                 ;;
             17)
                 print_info "Exiting the script."
-                break
+                exit 0  # Exit the script after breaking the loop
                 ;;
             *)
-                print_info "Invalid option, please select a number between 1 and 16." 
+                print_info "Invalid option, please select a number between 1 and 17." 
                 ;;
         esac
     done
