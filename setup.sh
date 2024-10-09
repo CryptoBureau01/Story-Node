@@ -17,6 +17,11 @@ PRIVATE_KEY_PATH="/root/.story/story/config/private_key.txt"
 # Read the private key without adding any spaces or formatting
 PRIVATE_KEY=$(cat "$PRIVATE_KEY_PATH" | sed 's/PRIVATE_KEY=//')
 
+# Command to get the EVM Public Key
+ADDRESS_COMMAND="/root/go/bin/story validator export - export-evm-key"
+
+# Extract the EVM Public Key from the command output
+ADDRESS_KEY=$($ADDRESS_COMMAND | grep "EVM Public Key" | awk '{print $4}')
 
 
 
@@ -612,50 +617,35 @@ print_info "<================= Show Validator Info ===============>"
 
 
 
-# Function to check the balance of an address using a private key
 check_balance() {
     print_info "<================= Balance Checker ===============>"
 
-    # Debugging: Print the path being checked
-    print_info "Checking private key file at: $PRIVATE_KEY_PATH"
+    # Debugging: Print the private key and address
+    print_info "Private Key: $PRIVATE_KEY"
+    print_info "EVM Address: $ADDRESS_KEY"
 
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
-        # Fetch the address from the private key (assuming you have a method to derive the address from it)
-        local address=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
-            "jsonrpc": "2.0",
-            "method": "eth_accounts",
-            "params": [],
-            "id": 1
-        }' | jq -r '.result[0]')
-
-        # Check if the address was retrieved successfully
-        if [[ -z "$address" ]]; then
-            print_info "Unable to retrieve address from the private key."
-            node_management_menu
-            return
-        fi
-
-        # Fetch the balance using the address
+        # Fetch the balance using the EVM address
         local balance=$(curl -s -X POST "https://testnet.storyrpc.io/" -H "Content-Type: application/json" -d '{
             "jsonrpc": "2.0",
             "method": "eth_getBalance",
-            "params": ["'$address'", "latest"],
+            "params": ["'$ADDRESS_KEY'", "latest"],
             "id": 1
         }' | jq -r '.result')
 
         # Check if the balance was retrieved successfully
-        if [[ "$balance" == "null" ]]; then
+        if [[ "$balance" == "null" || -z "$balance" ]]; then
             print_info "Unable to retrieve balance. Please check the address."
             node_management_menu
             return
         fi
 
-        # Convert balance from Wei to IP tokens (assuming 1 IP = 1e18 Wei)
-        local balance_in_ip=$(bc <<< "scale=18; $balance / 1000000000000000000")
+        # Convert balance from Wei to IP tokens using awk
+        local balance_in_ip=$(awk "BEGIN {printf \"%.18f\", $balance / 1000000000000000000}")
 
         # Print the balance information
-        print_info "Address: $address"
+        print_info "Address: $ADDRESS_KEY"
         print_info "Balance: $balance_in_ip IP"
     else
         print_info "Private key file does not exist. Please check the path: $PRIVATE_KEY_PATH"
@@ -664,6 +654,10 @@ check_balance() {
     # Return to node management menu
     node_management_menu
 }
+
+
+
+
 
 check_private_key() {
     print_info "<================= Private Key ===============>"
