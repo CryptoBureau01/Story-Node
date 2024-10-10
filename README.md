@@ -64,7 +64,7 @@ The script is interactive and waits for user input to select the desired operati
    This function installs all the necessary software packages and libraries required for the Story Protocol node to operate correctly. It ensures that the environment is set up with all prerequisites, minimizing compatibility issues and making the setup process smoother.
 
 2. **Story-Geth Binary Setup**:  
-   This option sets up the Story-Geth binary, which is essential for facilitating Ethereum-like interactions within the Story Protocol. It involves downloading the binary files, setting the correct paths, and ensuring that the node can communicate effectively with the Ethereum network.
+   This option sets up the Story-Geth binary, which is essential for facilitating Ethereum-like interactions within the Story Protocol. It involves downloading the binary files, setting the correct paths, and ensuring that the node can communicate effectively with the Story network.
 
 3. **Story Binary Setup**:  
    Configures the primary binary for the Story Protocol, which is responsible for handling various node operations. This function ensures that the binary is correctly installed and optimized for performance, enabling efficient processing of transactions and smart contracts on the network.
