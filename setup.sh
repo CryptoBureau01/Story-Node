@@ -23,8 +23,11 @@ ADDRESS_COMMAND="/root/go/bin/story validator export - export-evm-key"
 # Extract the EVM Public Key from the command output
 ADDRESS_KEY=$($ADDRESS_COMMAND | grep "EVM Public Key" | awk '{print $4}')
 
-# Command to get the Base64 Public Key
-BASE64_PUB_KEY=$(curl -s localhost:26657/status | jq -r '.result.validator_info.pub_key.value')
+# Path to the JSON file
+BASE64_PRIV_KEY="/root/.story/story/config/priv_validator_key.json"
+
+# Use `jq` to extract the priv_key value
+PRIV_KEY=$(jq -r '.priv_key.value' "$BASE64_PRIV_KEY")
 
 
 
@@ -664,6 +667,20 @@ check_balance() {
 # Function to check Private key
 check_private_key() {
     print_info "<================= Private Key ===============>"
+
+    # Decode base64 and convert to hex
+    PRIV_KEY_TXT=$(echo "$PRIV_KEY" | base64 -d | xxd -p)
+
+    # Check if the private_key.txt file already exists
+    if [ -f "$PRIVATE_KEY_PATH" ]; then
+       # If the file exists, print information
+       print_info "Private Key File already exists: $PRIVATE_KEY_PATH"
+    else
+       # If the file doesn't exist, create it and save the private key
+       echo "PRIVATE_KEY=$PRIV_KEY_TXT" > "$PRIVATE_KEY_PATH"
+       echo "Private Key File saved: $PRIVATE_KEY_PATH"
+    fi
+
 
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
