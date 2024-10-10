@@ -1,5 +1,29 @@
 #!/bin/bash
 
+# RPC URL for your Ethereum node
+RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
+
+# Function to check node sync status
+check_sync_status() {
+    SYNC_STATUS=$(curl -s -X POST -H "Content-Type: application/json" \
+        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}' \
+        "$RPC_URL")
+
+    if [[ $SYNC_STATUS == *"false"* ]]; then
+        echo "Node is not syncing."
+        print_info "Node is not syncing."
+    else
+        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.startingBlock')
+        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.currentBlock')
+        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.highestBlock')
+
+        echo "Node is syncing:"
+        print_info "Starting Block: $STARTING_BLOCK"
+        print_info "Current Block: $CURRENT_BLOCK"
+        print_info "Highest Block: $HIGHEST_BLOCK"
+    fi
+}
+
 # Function to print messages in color
 print_info() {
     echo -e "\033[1;32m$1\033[0m"
@@ -15,8 +39,6 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
-
-
 # Install lz4 and wget if not already installed
 print_info "Installing lz4 and wget..."
 if ! sudo apt-get install wget lz4 -y; then
@@ -24,17 +46,14 @@ if ! sudo apt-get install wget lz4 -y; then
     exit 1
 fi
 
-
 # Check if private key exists and backup priv_validator_state.json
 private_key_path="$HOME/.story/story/data/priv_validator_state.json"
 backup_path="$HOME/.story/priv_validator_state.json.backup"
-
 
 # Stop Story and Story-Geth services
 print_info "Stopping the Story and Story-Geth services..."
 sudo systemctl stop story
 sudo systemctl stop story-geth
-
 
 # Check if private key file exists
 if [ -f "$private_key_path" ]; then
@@ -50,8 +69,6 @@ else
     print_info "Private key does not exist. Moving to the next step..."
 fi
 
-
-
 # Function to confirm deletion
 confirm_deletion() {
     while true; do
@@ -63,10 +80,6 @@ confirm_deletion() {
         esac
     done
 }
-
-
-
-
 
 # Define the Archive function
 archive() {
@@ -252,7 +265,7 @@ pruned() {
         # Download the new Geth snapshot
         print_info "Downloading the Geth snapshot..."
         cd "$HOME"
-        if ! wget -O geth_snapshot.lz4 https://snapshots2.mandragora.io/story/geth_snapshot.lz4; then
+        if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
             print_error "Failed to download Geth snapshot"
             exit 1
         fi
@@ -282,7 +295,7 @@ pruned() {
 
         # Download the new Story snapshot
         print_info "Downloading the Story snapshot..."
-        if ! wget -O story_snapshot.lz4 https://snapshots2.mandragora.io/story/story_snapshot.lz4; then
+        if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
             print_error "Failed to download Story snapshot"
             exit 1
         fi
@@ -320,34 +333,32 @@ pruned() {
     print_info "Congratulations, Snapshot Sync completed!"
 }
 
+# Main Menu
+while true; do
+    print_info "Select an option:"
+    print_info "1: Download Archive Snapshot"
+    print_info "2: Download Pruned Snapshot"
+    print_info "3: Check Node Sync Status"
+    print_info "4: Exit"
 
+    read -p "Please enter your choice: " choice
 
-
-
-
-# Prompt user to choose between Archive, Pruned, or Exit
-print_info "Choose an option:"
-print_info "1. Archive"
-print_info "2. Pruned"
-print_info "3. Exit"
-
-# Read user input
-read -n 1 -p "Enter your choice: " choice
-echo ""  # New line after user input
-
-# Call the respective function based on user input
-case $choice in
-    1)
-        archive
-        ;;
-    2)
-        pruned
-        ;;
-    3)
-        print_info "Exiting."
-        exit 0
-        ;;
-    *)
-        print_info "Invalid choice. Please type 1, 2, or 3."
-        ;;
-esac
+    case "$choice" in
+        1)
+            archive
+            ;;
+        2)
+            pruned
+            ;;
+        3)
+            check_sync_status
+            ;;
+        4)
+            print_info "Exiting..."
+            exit 0
+            ;;
+        *)
+            print_error "Invalid choice. Please try again."
+            ;;
+    esac
+done
