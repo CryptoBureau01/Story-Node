@@ -86,135 +86,109 @@ archive() {
             ;;
         3)
             print_info "Exiting the script."
-            exit 0   # Exits the script
+            exit 0
             ;;
         *)
             print_info "Invalid option, please select a number between 1 and 3."
             ;;
     esac
 
-    # Call the confirmation function
-    if confirm_deletion; then
-        # If user confirms deletion
-        print_info "Deleting previous data..."
-        sudo rm -rf "$HOME/.story/geth/iliad/geth/chaindata"
-        sudo rm -rf "$HOME/.story/story/data"
-    else
-        print_info "Skipping data deletion. Proceeding with installation."
-    fi
 
-    # Proceed with snapshot installation
     if [ "$snapshot_choice" == "1" ]; then
         # Geth Snapshot Installation Process
-        print_info "You selected Geth Snapshot."
+        if [ -d "$HOME/.story/geth/iliad/geth" ]; then
+            print_info "Old Geth snapshot found. Do you want to delete it and download the new one? (y/n)"
+            read -r choice
+            case "$choice" in
+                [Yy]* )
+                    print_info "Deleting old Geth snapshot..."
+                    sudo cp "$private_key_path" "$backup_path"
+                    print_info "Private key backed up successfully!"
+                    rm -rf "$HOME/.story/geth/iliad/geth"
+                    print_info "Old Geth snapshot deleted."
 
-        if [ -f "$HOME/.story/geth/iliad/geth" ]; then
-        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
-        
-        read -r choice
-        case "$choice" in
-            [Yy]* )
-                print_info "Deleting old Story snapshot..."
-                sudo cp  "$private_key_path" "$backup_path" 
-                print_info "Private key Backup successfully!"
-                
-                rm -rf "$HOME/.story/geth/iliad/geth"
-                print_info "Old Story snapshot deleted."
-
-                # Download the new Story snapshot
-                print_info "Downloading the Story snapshot..."
-                if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
-                    print_error "Failed to download Story snapshot"
+                    # Download the new Geth snapshot
+                    print_info "Downloading the Geth snapshot..."
+                    if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+                        print_error "Failed to download Geth snapshot"
+                        exit 1
+                    fi
+                    print_info "Download completed successfully."
+                    ;;
+                [Nn]* )
+                    print_info "Exiting without deleting the old Geth snapshot."
+                    exit 0
+                    ;;
+                * )
+                    print_error "Invalid choice. Please enter y or n."
                     exit 1
-                fi
-                print_info "Download completed successfully."
-                ;;
-            [Nn]* )
-                print_info "Exiting without deleting the old Story snapshot."
-                exit 0
-                ;;
-            * )
-                print_error "Invalid choice. Please enter y or n."
+                    ;;
+            esac
+        else
+            # If no old Geth snapshot found, download the new one directly
+            print_info "No old Geth snapshot found. Downloading the new one..."
+            if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+                print_error "Failed to download Geth snapshot"
                 exit 1
-                ;;
-        esac
-    else
-        # If no old Story snapshot found, download the new one directly
-        print_info "No old Story snapshot found. Downloading the new one..."
-        
-        if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
-            print_error "Failed to download Story snapshot"
-            exit 1
+            fi
+            print_info "Download completed successfully."
         fi
-        print_info "Download completed successfully."
-    fi
-
 
     elif [ "$snapshot_choice" == "2" ]; then
-    # Story Snapshot Installation Process
-    print_info "You selected Story Snapshot."
+        # Story Snapshot Installation Process
+        if [ -d "$HOME/.story/story/data" ]; then
+            print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
+            read -r choice
+            case "$choice" in
+                [Yy]* )
+                    print_info "Deleting old Story snapshot..."
+                    sudo cp "$private_key_path" "$backup_path"
+                    print_info "Private key backed up successfully!"
+                    rm -rf "$HOME/.story/story/data"
+                    print_info "Old Story snapshot deleted."
 
-    # Check if the old Story snapshot exists
-    if [ -f "$HOME/.story/story/data" ]; then
-        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
-        
-        read -r choice
-        case "$choice" in
-            [Yy]* )
-                print_info "Deleting old Story snapshot..."
-                sudo cp  "$private_key_path" "$backup_path" 
-                print_info "Private key Backup successfully!"
-                
-                rm -rf "$HOME/.story/story/data"
-                print_info "Old Story snapshot deleted."
-
-                # Download the new Story snapshot
-                print_info "Downloading the Story snapshot..."
-                if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
-                    print_error "Failed to download Story snapshot"
+                    # Download the new Story snapshot
+                    print_info "Downloading the Story snapshot..."
+                    if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+                        print_error "Failed to download Story snapshot"
+                        exit 1
+                    fi
+                    print_info "Download completed successfully."
+                    ;;
+                [Nn]* )
+                    print_info "Exiting without deleting the old Story snapshot."
+                    exit 0
+                    ;;
+                * )
+                    print_error "Invalid choice. Please enter y or n."
                     exit 1
-                fi
-                print_info "Download completed successfully."
-                ;;
-            [Nn]* )
-                print_info "Exiting without deleting the old Story snapshot."
-                exit 0
-                ;;
-            * )
-                print_error "Invalid choice. Please enter y or n."
+                    ;;
+            esac
+        else
+            # If no old Story snapshot found, download the new one directly
+            print_info "No old Story snapshot found. Downloading the new one..."
+            if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+                print_error "Failed to download Story snapshot"
                 exit 1
-                ;;
-        esac
-    else
-        # If no old Story snapshot found, download the new one directly
-        print_info "No old Story snapshot found. Downloading the new one..."
-        
-        if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
-            print_error "Failed to download Story snapshot"
-            exit 1
+            fi
+            print_info "Download completed successfully."
         fi
-        print_info "Download completed successfully."
     fi
-
-
 
     # Restore priv_validator_state.json
     print_info "Checking for private key backup to restore..."
     if [ -f "$backup_path" ]; then
         print_info "Backup found. Restoring priv_validator_state.json..."
-        
-        # Attempt to restore the private key file
         if sudo cp "$backup_path" "$private_key_path"; then
             print_info "Restore completed successfully. priv_validator_state.json restored."
         else
             print_info "Failed to restore priv_validator_state.json."
         fi
     else
-        print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
+        print_info "No backup found. Skipping restoration."
     fi
 
-    # Final success message
-    print_info "Congratulations, Snapshot Sync completed!"
+    print_info "Snapshot Sync completed!"
 }
 
 
@@ -253,16 +227,6 @@ pruned() {
             print_info "Invalid option, please select a number between 1 and 3."
             ;;
     esac
-
-    # Call the confirmation function
-    if confirm_deletion; then
-        # If user confirms deletion
-        print_info "Deleting previous data..."
-        sudo rm -rf "$HOME/.story/geth/iliad/geth/chaindata"
-        sudo rm -rf "$HOME/.story/story/data"
-    else
-        print_info "Skipping data deletion. Proceeding with installation."
-    fi
 
     # Proceed with snapshot installation
     if [ "$snapshot_choice" == "1" ]; then
