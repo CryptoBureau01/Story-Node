@@ -59,11 +59,29 @@ confirm_deletion() {
     done
 }
 
-# Define the Archive function
-archive() {
-    print_info "You selected Archive snapshot."
-    
-    # Ask the user which snapshot to install
+
+# Function to restore priv_validator_state.json
+restore_priv_validator_state() {
+    print_info "Checking for private key backup to restore..."
+    if [ -f "$backup_path" ]; then
+        print_info "Backup found. Restoring priv_validator_state.json..."
+        if sudo cp "$backup_path" "$private_key_path"; then
+            print_info "Restore completed successfully. priv_validator_state.json restored."
+        else
+            print_info "Failed to restore priv_validator_state.json."
+        fi
+    else
+        print_info "No backup found. Skipping restoration."
+    fi
+
+    print_info "Snapshot Sync completed!"
+}
+
+
+
+
+# Function to ask the user which snapshot to install
+choose_snapshot() {
     print_info "Which snapshot would you like to install?"
     print_info "1: Geth Snapshot"
     print_info "2: Story Snapshot"
@@ -86,14 +104,23 @@ archive() {
             ;;
         3)
             print_info "Exiting the script."
-            exit 0
+            exit 0   # Exits the script
             ;;
         *)
             print_info "Invalid option, please select a number between 1 and 3."
             ;;
     esac
+}
 
 
+
+# Define the Archive function
+archive() {
+    print_info "You selected Archive snapshot."
+
+    # Function to ask the user which snapshot to install
+    choose_snapshot
+    
     if [ "$snapshot_choice" == "1" ]; then
         # Geth Snapshot Installation Process
         if [ -d "$HOME/.story/geth/iliad/geth" ]; then
@@ -175,20 +202,8 @@ archive() {
         fi
     fi
 
-    # Restore priv_validator_state.json
-    print_info "Checking for private key backup to restore..."
-    if [ -f "$backup_path" ]; then
-        print_info "Backup found. Restoring priv_validator_state.json..."
-        if sudo cp "$backup_path" "$private_key_path"; then
-            print_info "Restore completed successfully. priv_validator_state.json restored."
-        else
-            print_info "Failed to restore priv_validator_state.json."
-        fi
-    else
-        print_info "No backup found. Skipping restoration."
-    fi
-
-    print_info "Snapshot Sync completed!"
+    # Private key Backup Function 
+    restore_priv_validator_state
 }
 
 
@@ -198,35 +213,8 @@ archive() {
 pruned() {
     print_info "You selected Archive snapshot."
     
-    # Ask the user which snapshot to install
-    print_info "Which snapshot would you like to install?"
-    print_info "1: Geth Snapshot"
-    print_info "2: Story Snapshot"
-    print_info "3: Exit"
-
-    read -p "Please enter your choice: " snapshot_choice
-
-    # Check user input and exit if invalid
-    if [ "$snapshot_choice" != "1" ] && [ "$snapshot_choice" != "2" ] && [ "$snapshot_choice" != "3" ]; then
-        print_error "Invalid choice. Please run the script again and select 1, 2, or 3."
-        exit 1
-    fi
-
-    case $snapshot_choice in
-        1)
-            print_info "You selected Geth Snapshot."
-            ;;
-        2)
-            print_info "You selected Story Snapshot."
-            ;;
-        3)
-            print_info "Exiting the script."
-            exit 0   # Exits the script
-            ;;
-        *)
-            print_info "Invalid option, please select a number between 1 and 3."
-            ;;
-    esac
+    # Function to ask the user which snapshot to install
+    choose_snapshot
 
     # Proceed with snapshot installation
     if [ "$snapshot_choice" == "1" ]; then
@@ -321,25 +309,8 @@ pruned() {
         print_info "Download completed successfully."
     fi
 
-
-
     # Restore priv_validator_state.json
-    print_info "Checking for private key backup to restore..."
-    if [ -f "$backup_path" ]; then
-        print_info "Backup found. Restoring priv_validator_state.json..."
-        
-        # Attempt to restore the private key file
-        if sudo cp "$backup_path" "$private_key_path"; then
-            print_info "Restore completed successfully. priv_validator_state.json restored."
-        else
-            print_info "Failed to restore priv_validator_state.json."
-        fi
-    else
-        print_info "No backup found. Looks like you don't have a previous private key. Skipping restoration."
-    fi
-
-    # Final success message
-    print_info "Congratulations, Snapshot Sync completed!"
+    restore_priv_validator_state
 
     
 }
