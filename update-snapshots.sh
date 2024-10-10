@@ -108,63 +108,95 @@ archive() {
         # Geth Snapshot Installation Process
         print_info "You selected Geth Snapshot."
 
-        # Check and delete the old Geth snapshot if it exists
-        if [ -f "$HOME/geth_snapshot.lz4" ]; then
-            print_info "Old Geth snapshot found. Deleting..."
-            rm "$HOME/geth_snapshot.lz4"
-        fi
+        if [ -f "$HOME/.story/geth/iliad/geth" ]; then
+        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
+        
+        read -r choice
+        case "$choice" in
+            [Yy]* )
+                print_info "Deleting old Story snapshot..."
+                sudo cp  "$private_key_path" "$backup_path" 
+                print_info "Private key Backup successfully!"
+                
+                rm -rf "$HOME/.story/geth/iliad/geth"
+                print_info "Old Story snapshot deleted."
 
-        # Download the new Geth snapshot
-        print_info "Downloading the Geth snapshot..."
-        cd "$HOME"
-        if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
-            print_error "Failed to download Geth snapshot"
-            exit 1
-        fi
-
-        # Unzip Geth snapshot
-        print_info "Extracting Geth snapshot..."
-        if ! lz4 -c -d geth_snapshot.lz4 | tar -xv -C "$HOME/.story/geth/iliad/geth"; then
-            print_error "Failed to extract Geth snapshot"
-            exit 1
-        fi
-
-        # Delete the Geth snapshot file after extraction
-        if ! rm -f geth_snapshot.lz4; then
-            print_error "Failed to delete the Geth snapshot file"
-            exit 1
-        fi
-
-    elif [ "$snapshot_choice" == "2" ]; then
-        # Story Snapshot Installation Process
-        print_info "You selected Story Snapshot."
-
-        # Check and delete the old Story snapshot if it exists
-        if [ -f "$HOME/story_snapshot.lz4" ]; then
-            print_info "Old Story snapshot found. Deleting..."
-            rm "$HOME/story_snapshot.lz4"
-        fi
-
-        # Download the new Story snapshot
-        print_info "Downloading the Story snapshot..."
-        if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
+                # Download the new Story snapshot
+                print_info "Downloading the Story snapshot..."
+                if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+                    print_error "Failed to download Story snapshot"
+                    exit 1
+                fi
+                print_info "Download completed successfully."
+                ;;
+            [Nn]* )
+                print_info "Exiting without deleting the old Story snapshot."
+                exit 0
+                ;;
+            * )
+                print_error "Invalid choice. Please enter y or n."
+                exit 1
+                ;;
+        esac
+    else
+        # If no old Story snapshot found, download the new one directly
+        print_info "No old Story snapshot found. Downloading the new one..."
+        
+        if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
             print_error "Failed to download Story snapshot"
             exit 1
         fi
-
-        # Unzip Story snapshot
-        print_info "Extracting Story snapshot..."
-        if ! lz4 -c -d story_snapshot.lz4 | tar -xv -C "$HOME/.story/story"; then
-            print_error "Failed to extract Story snapshot"
-            exit 1
-        fi
-
-        # Delete the Story snapshot file after extraction
-        if ! rm -f story_snapshot.lz4; then
-            print_error "Failed to delete the Story snapshot file"
-            exit 1
-        fi
+        print_info "Download completed successfully."
     fi
+
+
+    elif [ "$snapshot_choice" == "2" ]; then
+    # Story Snapshot Installation Process
+    print_info "You selected Story Snapshot."
+
+    # Check if the old Story snapshot exists
+    if [ -f "$HOME/.story/story/data" ]; then
+        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
+        
+        read -r choice
+        case "$choice" in
+            [Yy]* )
+                print_info "Deleting old Story snapshot..."
+                sudo cp  "$private_key_path" "$backup_path" 
+                print_info "Private key Backup successfully!"
+                
+                rm -rf "$HOME/.story/story/data"
+                print_info "Old Story snapshot deleted."
+
+                # Download the new Story snapshot
+                print_info "Downloading the Story snapshot..."
+                if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+                    print_error "Failed to download Story snapshot"
+                    exit 1
+                fi
+                print_info "Download completed successfully."
+                ;;
+            [Nn]* )
+                print_info "Exiting without deleting the old Story snapshot."
+                exit 0
+                ;;
+            * )
+                print_error "Invalid choice. Please enter y or n."
+                exit 1
+                ;;
+        esac
+    else
+        # If no old Story snapshot found, download the new one directly
+        print_info "No old Story snapshot found. Downloading the new one..."
+        
+        if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+            print_error "Failed to download Story snapshot"
+            exit 1
+        fi
+        print_info "Download completed successfully."
+    fi
+
+
 
     # Restore priv_validator_state.json
     print_info "Checking for private key backup to restore..."
@@ -185,9 +217,12 @@ archive() {
     print_info "Congratulations, Snapshot Sync completed!"
 }
 
+
+
+
 # Define the Pruned function
 pruned() {
-    print_info "You selected Pruned snapshot."
+    print_info "You selected Archive snapshot."
     
     # Ask the user which snapshot to install
     print_info "Which snapshot would you like to install?"
@@ -234,63 +269,95 @@ pruned() {
         # Geth Snapshot Installation Process
         print_info "You selected Geth Snapshot."
 
-        # Check and delete the old Geth snapshot if it exists
-        if [ -f "$HOME/geth_snapshot.lz4" ]; then
-            print_info "Old Geth snapshot found. Deleting..."
-            rm "$HOME/geth_snapshot.lz4"
-        fi
+        if [ -f "$HOME/.story/geth/iliad/geth" ]; then
+        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
+        
+        read -r choice
+        case "$choice" in
+            [Yy]* )
+                print_info "Deleting old Story snapshot..."
+                sudo cp  "$private_key_path" "$backup_path" 
+                print_info "Private key Backup successfully!"
+                
+                rm -rf "$HOME/.story/geth/iliad/geth"
+                print_info "Old Story snapshot deleted."
 
-        # Download the new Geth snapshot
-        print_info "Downloading the Geth snapshot..."
-        cd "$HOME"
-        if ! wget -O geth_snapshot.lz4 https://snapshots.mandragora.io/geth_snapshot.lz4; then
-            print_error "Failed to download Geth snapshot"
-            exit 1
-        fi
-
-        # Unzip Geth snapshot
-        print_info "Extracting Geth snapshot..."
-        if ! lz4 -c -d geth_snapshot.lz4 | tar -xv -C "$HOME/.story/geth/iliad/geth"; then
-            print_error "Failed to extract Geth snapshot"
-            exit 1
-        fi
-
-        # Delete the Geth snapshot file after extraction
-        if ! rm -f geth_snapshot.lz4; then
-            print_error "Failed to delete the Geth snapshot file"
-            exit 1
-        fi
-
-    elif [ "$snapshot_choice" == "2" ]; then
-        # Story Snapshot Installation Process
-        print_info "You selected Story Snapshot."
-
-        # Check and delete the old Story snapshot if it exists
-        if [ -f "$HOME/story_snapshot.lz4" ]; then
-            print_info "Old Story snapshot found. Deleting..."
-            rm "$HOME/story_snapshot.lz4"
-        fi
-
-        # Download the new Story snapshot
-        print_info "Downloading the Story snapshot..."
-        if ! wget -O story_snapshot.lz4 https://snapshots.mandragora.io/story_snapshot.lz4; then
+                # Download the new Story snapshot
+                print_info "Downloading the Story snapshot..."
+                if ! curl -L https://snapshots2.mandragora.io/story/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+                    print_error "Failed to download Story snapshot"
+                    exit 1
+                fi
+                print_info "Download completed successfully."
+                ;;
+            [Nn]* )
+                print_info "Exiting without deleting the old Story snapshot."
+                exit 0
+                ;;
+            * )
+                print_error "Invalid choice. Please enter y or n."
+                exit 1
+                ;;
+        esac
+    else
+        # If no old Story snapshot found, download the new one directly
+        print_info "No old Story snapshot found. Downloading the new one..."
+        
+        if ! curl -L https://snapshots2.mandragora.io/story/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
             print_error "Failed to download Story snapshot"
             exit 1
         fi
-
-        # Unzip Story snapshot
-        print_info "Extracting Story snapshot..."
-        if ! lz4 -c -d story_snapshot.lz4 | tar -xv -C "$HOME/.story/story"; then
-            print_error "Failed to extract Story snapshot"
-            exit 1
-        fi
-
-        # Delete the Story snapshot file after extraction
-        if ! rm -f story_snapshot.lz4; then
-            print_error "Failed to delete the Story snapshot file"
-            exit 1
-        fi
+        print_info "Download completed successfully."
     fi
+
+
+    elif [ "$snapshot_choice" == "2" ]; then
+    # Story Snapshot Installation Process
+    print_info "You selected Story Snapshot."
+
+    # Check if the old Story snapshot exists
+    if [ -f "$HOME/.story/story/data" ]; then
+        print_info "Old Story snapshot found. Do you want to delete it and download the new one? (y/n)"
+        
+        read -r choice
+        case "$choice" in
+            [Yy]* )
+                print_info "Deleting old Story snapshot..."
+                sudo cp  "$private_key_path" "$backup_path" 
+                print_info "Private key Backup successfully!"
+                
+                rm -rf "$HOME/.story/story/data"
+                print_info "Old Story snapshot deleted."
+
+                # Download the new Story snapshot
+                print_info "Downloading the Story snapshot..."
+                if ! curl -L https://snapshots2.mandragora.io/story/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+                    print_error "Failed to download Story snapshot"
+                    exit 1
+                fi
+                print_info "Download completed successfully."
+                ;;
+            [Nn]* )
+                print_info "Exiting without deleting the old Story snapshot."
+                exit 0
+                ;;
+            * )
+                print_error "Invalid choice. Please enter y or n."
+                exit 1
+                ;;
+        esac
+    else
+        # If no old Story snapshot found, download the new one directly
+        print_info "No old Story snapshot found. Downloading the new one..."
+        
+        if ! curl -L https://snapshots2.mandragora.io/story/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+            print_error "Failed to download Story snapshot"
+            exit 1
+        fi
+        print_info "Download completed successfully."
+    fi
+
+
 
     # Restore priv_validator_state.json
     print_info "Checking for private key backup to restore..."
@@ -316,14 +383,13 @@ pruned() {
 
 
 
+
 # RPC URL for your Ethereum node
 RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
 
 # Function to check node sync status
 check_sync_status() {
-    SYNC_STATUS=$(curl -s -X POST -H "Content-Type: application/json" \
-        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}' \
-        "$RPC_URL")
+    SYNC_STATUS=$(curl -s localhost:26657/status | jq -r '.result.sync_info.catching_up')
 
     if [[ $SYNC_STATUS == *"false"* ]]; then
         echo "Node is not syncing."
