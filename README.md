@@ -57,7 +57,7 @@ The script is interactive and waits for user input to select the desired operati
    - **Options List**: A list of available actions, like "Install Dependencies," "Story-Geth Binary Setup," "Node Status," etc., is presented to the user.  
    - The script waits for user input, validates the selection, and then calls the appropriate function corresponding to the chosen option.  
 
-2. ## Menu Options  
+2. ### Menu Options  
 **Each option is mapped to a specific function that performs a task. Here are the details for each option:**
 
 1. **Install-Dependencies**:  
@@ -119,6 +119,9 @@ The script is interactive and waits for user input to select the desired operati
 
 20. **Exit**:  
     Closes the script and exits the menu, providing a graceful way to terminate the session. This function ensures that any ongoing processes are safely halted before exiting the management interface.
+
+
+
 
 
 3. **Interactive Prompt**:  
