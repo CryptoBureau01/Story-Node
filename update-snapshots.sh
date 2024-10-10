@@ -1,29 +1,5 @@
 #!/bin/bash
 
-# RPC URL for your Ethereum node
-RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
-
-# Function to check node sync status
-check_sync_status() {
-    SYNC_STATUS=$(curl -s -X POST -H "Content-Type: application/json" \
-        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}' \
-        "$RPC_URL")
-
-    if [[ $SYNC_STATUS == *"false"* ]]; then
-        echo "Node is not syncing."
-        print_info "Node is not syncing."
-    else
-        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.startingBlock')
-        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.currentBlock')
-        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.highestBlock')
-
-        echo "Node is syncing:"
-        print_info "Starting Block: $STARTING_BLOCK"
-        print_info "Current Block: $CURRENT_BLOCK"
-        print_info "Highest Block: $HIGHEST_BLOCK"
-    fi
-}
-
 # Function to print messages in color
 print_info() {
     echo -e "\033[1;32m$1\033[0m"
@@ -38,6 +14,8 @@ if [ "$EUID" -ne 0 ]; then
     print_error "Please run as root"
     exit 1
 fi
+
+
 
 # Install lz4 and wget if not already installed
 print_info "Installing lz4 and wget..."
@@ -333,32 +311,68 @@ pruned() {
     print_info "Congratulations, Snapshot Sync completed!"
 }
 
-# Main Menu
-while true; do
-    print_info "Select an option:"
-    print_info "1: Download Archive Snapshot"
-    print_info "2: Download Pruned Snapshot"
-    print_info "3: Check Node Sync Status"
-    print_info "4: Exit"
+# RPC URL for your Ethereum node
+RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
 
-    read -p "Please enter your choice: " choice
+# Function to check node sync status
+check_sync_status() {
+    SYNC_STATUS=$(curl -s -X POST -H "Content-Type: application/json" \
+        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_syncing", "params": []}' \
+        "$RPC_URL")
 
-    case "$choice" in
-        1)
-            archive
-            ;;
-        2)
-            pruned
-            ;;
-        3)
-            check_sync_status
-            ;;
-        4)
-            print_info "Exiting..."
-            exit 0
-            ;;
-        *)
-            print_error "Invalid choice. Please try again."
-            ;;
-    esac
-done
+    if [[ $SYNC_STATUS == *"false"* ]]; then
+        echo "Node is not syncing."
+        print_info "Node is not syncing."
+    else
+        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.startingBlock')
+        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.currentBlock')
+        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.highestBlock')
+
+        echo "Node is syncing:"
+        print_info "Starting Block: $STARTING_BLOCK"
+        print_info "Current Block: $CURRENT_BLOCK"
+        print_info "Highest Block: $HIGHEST_BLOCK"
+    fi
+
+
+    # Call the main menu function
+    main_menu
+}
+
+
+
+
+main_menu() {
+    while true; do
+        print_info "Select an option:"
+        print_info "1: Download Archive Snapshot"
+        print_info "2: Download Pruned Snapshot"
+        print_info "3: Check Node Sync Status"
+        print_info "4: Exit"
+
+        read -p "Please enter your choice: " choice
+
+        case "$choice" in
+            1)
+                archive
+                ;;
+            2)
+                pruned
+                ;;
+            3)
+                check_sync_status
+                ;;
+            4)
+                print_info "Exiting..."
+                exit 0
+                ;;
+            *)
+                print_error "Invalid choice. Please try again."
+                ;;
+        esac
+    done
+}
+
+
+# Call the main menu function
+main_menu
