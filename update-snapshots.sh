@@ -380,56 +380,28 @@ pruned() {
 
 
 
-
-
-
-
-# RPC URL for your Ethereum node
-RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
-
 # Function to check node sync status
 check_sync_status() {
-    SYNC_STATUS=$(curl -s localhost:26657/status | jq -r '.result.sync_info.catching_up')
+    # Fetch sync status from the node
+    SYNC_STATUS=$(curl -s localhost:26657/status)
 
-    if [[ $SYNC_STATUS == *"false"* ]]; then
+    # Check if the node is catching up or fully synced
+    CATCHING_UP=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.catching_up')
+
+    if [[ $CATCHING_UP == "false" ]]; then
         echo "Node is not syncing."
         print_info "Node is not syncing."
     else
-        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.startingBlock')
-        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.currentBlock')
-        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.highestBlock')
+        # Get the starting, current, highest, and latest block heights
+        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.earliest_block_height')
+        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.latest_block_height')
+        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.highest_block_height')
 
         echo "Node is syncing:"
         print_info "Starting Block: $STARTING_BLOCK"
         print_info "Current Block: $CURRENT_BLOCK"
         print_info "Highest Block: $HIGHEST_BLOCK"
     fi
-}
-
-# Function to print information
-print_info() {
-    echo "$1"
-}
-
-# Function to get the latest block number
-get_latest_block_number() {
-    LATEST_BLOCK=$(curl -s -X POST -H "Content-Type: application/json" \
-        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}' \
-        "$RPC_URL")
-
-    if [[ $LATEST_BLOCK == *"result"* ]]; then
-        BLOCK_NUMBER=$(echo "$LATEST_BLOCK" | jq -r '.result')
-        BLOCK_NUMBER_DECIMAL=$((16#$BLOCK_NUMBER)) # Convert from hex to decimal
-        print_info "Latest Block Number: $BLOCK_NUMBER_DECIMAL"
-    else
-        print_info "Error fetching latest block number."
-    fi
-}
-
-# Check Sync Main function
-check_sync_main() {
-    check_sync_status
-    get_latest_block_number
 }
 
 
@@ -454,7 +426,7 @@ main_menu() {
                 pruned
                 ;;
             3)
-                check_sync_main
+                check_sync_status
                 ;;
             4)
                 print_info "Exiting..."
