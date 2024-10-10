@@ -831,6 +831,10 @@ remove_node() {
 
 # Function to display the Node Management Menu
 node_management_menu() {
+
+    print_info ""
+    print_info "<============= Created by CryptoBuroMaster ============>"
+    print_info ""
     print_info "<================= Node Management Menu ===============>"
     
     options=(
@@ -856,6 +860,10 @@ node_management_menu() {
         "Exit"
     )
 
+   print_info ""
+   print_info "<===== Created by CryptoBuroMaster, this Auto-Story-Node-Setup Tool simplifies node management. =====>"
+   print_info ""
+   
     # Display options with numbers
     for i in "${!options[@]}"; do
         echo "$((i + 1)). ${options[$i]}"
