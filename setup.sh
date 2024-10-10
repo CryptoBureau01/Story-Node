@@ -694,12 +694,14 @@ check_private_key() {
     else
        # If the file doesn't exist, create it and save the private key
        echo "PRIVATE_KEY=$PRIV_KEY_TXT" > "$PRIVATE_KEY_PATH"
-       echo "Private Key File saved: $PRIVATE_KEY_PATH"
+       print_info "Private Key File saved: $PRIVATE_KEY_PATH"
     fi
-
 
     # Check if the private key file exists
     if [[ -f "$PRIVATE_KEY_PATH" ]]; then
+        # Read the private key from the file
+        PRIVATE_KEY=$(grep 'PRIVATE_KEY=' "$PRIVATE_KEY_PATH" | cut -d'=' -f2)
+
         # Print the private key directly
         print_info "Private key: $PRIVATE_KEY"
 
@@ -725,6 +727,7 @@ check_private_key() {
     # Return to node management menu
     node_management_menu    
 }
+
 
 
 # Full Backup Function
