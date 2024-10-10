@@ -122,13 +122,12 @@ The script is interactive and waits for user input to select the desired operati
 
 
 
-
-
-3. **Interactive Prompt**:  
+# Error Handling && Interactive Prompt
+1. **Interactive Prompt**:  
    The `while true` loop keeps the script running until the user selects the "Exit" option (Option 20).  
    For each selection, the script displays relevant information and calls the corresponding function to perform the action.
 
-4. **Error Handling**:  
+2. **Error Handling**:  
    If an invalid option is chosen, the script prompts the user to enter a valid number (between 1 and 20).
 
 
