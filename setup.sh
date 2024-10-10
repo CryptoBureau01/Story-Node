@@ -859,10 +859,6 @@ node_management_menu() {
         "Remove-Node"
         "Exit"
     )
-
-   print_info ""
-   print_info "<===== Created by CryptoBuroMaster, this Auto-Story-Node-Setup Tool simplifies node management. =====>"
-   print_info ""
    
     # Display options with numbers
     for i in "${!options[@]}"; do
@@ -954,11 +950,7 @@ node_management_menu() {
                 ;;
             *)
 
-            print_info ""
-            print_info ""
-            print_info "<===== Created by CryptoBuroMaster, this Auto-Story-Node-Setup Tool simplifies node management. =====>"
-            print_info ""
-            print_info ""
+
                 print_info "Invalid option, please select a number between 1 and 20." 
                 ;;
         esac
