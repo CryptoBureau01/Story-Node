@@ -210,8 +210,8 @@ archive() {
 
 
 # Define the Archive function
-archive() {
-    print_info "You selected Archive snapshot."
+pruned() {
+    print_info "You selected Pruned snapshot."
 
     # Function to ask the user which snapshot to install
     choose_snapshot
@@ -231,7 +231,7 @@ archive() {
 
                     # Download the new Geth snapshot
                     print_info "Downloading the Geth snapshot..."
-                    if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+                    if ! curl -L https://snapshots2.mandragora.io/story/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
                         print_error "Failed to download Geth snapshot"
                         exit 1
                     fi
@@ -249,7 +249,7 @@ archive() {
         else
             # If no old Geth snapshot found, download the new one directly
             print_info "No old Geth snapshot found. Downloading the new one..."
-            if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
+            if ! curl -L https://snapshots2.mandragora.io/story/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
                 print_error "Failed to download Geth snapshot"
                 exit 1
             fi
@@ -271,7 +271,7 @@ archive() {
 
                     # Download the new Story snapshot
                     print_info "Downloading the Story snapshot..."
-                    if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+                    if ! curl -L https://snapshots2.mandragora.io/story/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
                         print_error "Failed to download Story snapshot"
                         exit 1
                     fi
@@ -289,7 +289,7 @@ archive() {
         else
             # If no old Story snapshot found, download the new one directly
             print_info "No old Story snapshot found. Downloading the new one..."
-            if ! curl -L https://snapshots.mandragora.io/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
+            if ! curl -L https://snapshots2.mandragora.io/story/story_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/story"; then
                 print_error "Failed to download Story snapshot"
                 exit 1
             fi
