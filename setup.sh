@@ -945,6 +945,12 @@ node_management_menu() {
                 exit 0  # Exit the script after breaking the loop
                 ;;
             *)
+
+            print_info ""
+            print_info ""
+            print_info "<===== Created by CryptoBuroMaster, this Auto-Story-Node-Setup Tool simplifies node management. =====>"
+            print_info ""
+            print_info ""
                 print_info "Invalid option, please select a number between 1 and 20." 
                 ;;
         esac
