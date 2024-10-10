@@ -340,6 +340,8 @@ pruned() {
 
     # Final success message
     print_info "Congratulations, Snapshot Sync completed!"
+
+    
 }
 
 
