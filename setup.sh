@@ -684,8 +684,8 @@ check_balance() {
 check_private_key() {
     print_info "<================= Private Key ===============>"
 
-    # Decode base64 and convert to hex
-    PRIV_KEY_TXT=$(echo "$PRIV_KEY" | base64 -d | xxd -p)
+    # Decode base64 and convert to hex, then trim
+    PRIV_KEY_TXT=$(echo "$PRIV_KEY" | base64 -d | xxd -p | tr -d '\n' | xargs)
 
     # Check if the private_key.txt file already exists
     if [ -f "$PRIVATE_KEY_PATH" ]; then
@@ -711,7 +711,7 @@ check_private_key() {
             return 1
         fi
 
-        # Check if the private key is 64 characters long (assuming it's a valid hex string)
+        # Check if the private key is 64 characters long
         if [[ ${#PRIVATE_KEY} -ne 64 ]]; then
             echo "Invalid private key format. A valid key should be 64 characters long."
             return 1
@@ -727,6 +727,7 @@ check_private_key() {
     # Return to node management menu
     node_management_menu    
 }
+
 
 
 
