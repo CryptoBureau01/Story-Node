@@ -311,6 +311,11 @@ pruned() {
     print_info "Congratulations, Snapshot Sync completed!"
 }
 
+
+
+
+
+
 # RPC URL for your Ethereum node
 RPC_URL="http://localhost:8545" # Replace with your node's RPC URL
 
@@ -333,15 +338,38 @@ check_sync_status() {
         print_info "Current Block: $CURRENT_BLOCK"
         print_info "Highest Block: $HIGHEST_BLOCK"
     fi
+}
 
+# Function to print information
+print_info() {
+    echo "$1"
+}
 
-    # Call the main menu function
-    main_menu
+# Function to get the latest block number
+get_latest_block_number() {
+    LATEST_BLOCK=$(curl -s -X POST -H "Content-Type: application/json" \
+        -d '{"jsonrpc": "2.0", "id": 1, "method": "eth_blockNumber", "params": []}' \
+        "$RPC_URL")
+
+    if [[ $LATEST_BLOCK == *"result"* ]]; then
+        BLOCK_NUMBER=$(echo "$LATEST_BLOCK" | jq -r '.result')
+        BLOCK_NUMBER_DECIMAL=$((16#$BLOCK_NUMBER)) # Convert from hex to decimal
+        print_info "Latest Block Number: $BLOCK_NUMBER_DECIMAL"
+    else
+        print_info "Error fetching latest block number."
+    fi
+}
+
+# Check Sync Main function
+check_sync_main() {
+    check_sync_status
+    get_latest_block_number
 }
 
 
 
 
+# Main Menu Fanction 
 main_menu() {
     while true; do
         print_info "Select an option:"
@@ -360,7 +388,7 @@ main_menu() {
                 pruned
                 ;;
             3)
-                check_sync_status
+                check_sync_main
                 ;;
             4)
                 print_info "Exiting..."
