@@ -581,6 +581,22 @@ stop_nodes() {
 }
 
 
+# Function to stop nodes
+refresh_nodes() {
+    print_info "<================= Refresh Nodes ================>"
+    print_info "Please Wait..."
+    sudo systemctl stop story-geth.service
+    sudo systemctl stop story.service
+
+    sudo systemctl daemon-reload
+    sudo systemctl enable story-geth
+    sudo systemctl enable story
+    sudo systemctl start story-geth
+    sudo systemctl start story
+    print_info "Now Successfully Refresh...."
+    node_management_menu
+}
+
 
 # Function to check node sync status
 check_node_status() {
@@ -822,6 +838,7 @@ node_management_menu() {
         "Update-Snapshot"
         "Stop-Node"
         "Start-Node"
+        "Refresh-Node"
         "Logs-Checker"
         "Node-Status"
         "Validator-Info"
@@ -830,7 +847,7 @@ node_management_menu() {
         "Stake-IP"
         "UnStake-IP"
         "Full-Backup"
-        "Restore-Backup"
+        "Recovery-Backup"
         "Remove-Node"
         "Exit"
     )
@@ -841,7 +858,7 @@ node_management_menu() {
     done
 
     while true; do
-        read -p "Please select an option (1-18): " choice
+        read -p "Please select an option (1-20): " choice
          case $choice in
             1)
                 print_info "You selected to install dependencies."
@@ -876,51 +893,55 @@ node_management_menu() {
                 start_nodes  # Call the start node function
                 ;;
             9)
+                print_info "You selected to start the node."
+                refresh_nodes  # Call the start node function
+                ;;
+            10)
                 print_info "You selected Logs Checker."
                 logs_checker  # Call the Logs Checker function
                 ;;
-            10)
+            11)
                 print_info "Starting the node status check..."
                 check_node_status # Call the Node Status function
                 ;;
-            11)
+            12)
                 print_info "Check Your Validator Info"
                 show_validator_info  # Call the Validator Info function
                 ;;
-            12)
+            13)
                 print_info "Check Your Private Key."
                 check_private_key  # Call the Private Key Checker function
                 ;;
-            13)
+            14)
                 print_info "Check Your Account Balance."
                 check_balance  # Call the Account Balance Checker function
                 ;;
-            14)
+            15)
                 print_info "You selected to stake IP."
                 stake_ip  # Call the stake IP function
                 ;;
-            15)
+            16)
                 print_info "You selected to unstake IP."
                 unstake_ip  # Call the unstake IP function
                 ;;
-            16)
+            17)
                 print_info "You selected to Full Backup node."
                 full_backup  # Call the remove node function
                 ;;
-            17)
+            18)
                 print_info "You selected to Full Backup node."
                 restore_backup  # Call the remove node function
                 ;;
-            18)
+            19)
                 print_info "You selected to remove the node."
                 remove_node  # Call the remove node function
                 ;;
-            19)
+            20)
                 print_info "Exiting the script."
                 exit 0  # Exit the script after breaking the loop
                 ;;
             *)
-                print_info "Invalid option, please select a number between 1 and 17." 
+                print_info "Invalid option, please select a number between 1 and 20." 
                 ;;
         esac
     done
