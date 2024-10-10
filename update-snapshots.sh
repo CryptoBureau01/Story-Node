@@ -150,10 +150,10 @@ elif [ "$snapshot_choice" == "2" ]; then
     fi
 
     # Delete the Story snapshot file after extraction
-    if ! rm -f story_snapshot.lz4; then
-        print_error "Failed to delete the Story snapshot file"
-        exit 1
-    fi
+    #if ! rm -f story_snapshot.lz4; then
+       # print_error "Failed to delete the Story snapshot file"
+       # exit 1
+    #fi
 fi
 
 # Restore priv_validator_state.json
