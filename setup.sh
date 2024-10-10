@@ -600,14 +600,28 @@ refresh_nodes() {
 
 # Function to check node sync status
 check_node_status() {
-    status=$(curl -s localhost:26657/status | jq -r '.result.sync_info.catching_up')
+    # Fetch sync status from the node
+    SYNC_STATUS=$(curl -s localhost:26657/status)
 
-    if [[ "$status" == "false" ]]; then
-        print_info "Node is fully synced with the network."
+    # Check if the node is catching up or fully synced
+    CATCHING_UP=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.catching_up')
+
+    if [[ $CATCHING_UP == "false" ]]; then
+        echo "Node is not syncing."
+        print_info "Node is not syncing."
     else
-        print_info "Node is currently catching up and is not fully synced with the network."
+        # Get the starting, current, highest, and latest block heights
+        STARTING_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.earliest_block_height')
+        CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.latest_block_height')
+        HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.highest_block_height')
+
+        echo "Node is syncing:"
+        print_info "Starting Block: $STARTING_BLOCK"
+        print_info "Current Block: $CURRENT_BLOCK"
+        print_info "Highest Block: $HIGHEST_BLOCK"
     fi
 
+    
     # Return to node management menu
     node_management_menu
 }
