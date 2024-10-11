@@ -285,6 +285,14 @@ setup_story_binary() {
         exit 1
     fi
 
+    # Make the binary executable
+    print_info "Making the binary executable..."
+    if ! chmod +x "/usr/local/bin/story"; then
+        print_error "Failed to make the binary executable"
+        exit 1
+    fi
+
+
     # Check the Story version to confirm the update
     print_info "Checking the Story version..."
     if ! "$HOME/go/bin/story" version; then
