@@ -37,6 +37,17 @@ function install_dependencies {
 }
 
 
+# Functions for each menu option
+function geth_version {
+    print_info "Displaying Geth Logs..."
+    sudo journalctl -u story-geth -f -o cat
+}
+
+# Functions for each menu option
+function story_version {
+    print_info "Displaying Geth Logs..."
+    sudo journalctl -u story-geth -f -o cat
+}
 
 # Functions for each menu option
 function geth_logs {
@@ -69,12 +80,14 @@ function story_status {
 # Function to display the logs menu
 function show_logs_menu {
     echo "Logs Menu:"
-    echo "1. Geth-Logs"
-    echo "2. Story-Logs"
-    echo "3. Sync-Status"
-    echo "4. Geth-Status"
-    echo "5. Story-Status"
-    echo "6. Exit"
+    echo "1. Geth-Version"
+    echo "2. Story-Version"
+    echo "3. Geth-Logs"
+    echo "4. Story-Logs"
+    echo "5. Sync-Status"
+    echo "6. Geth-Status"
+    echo "7. Story-Status"
+    echo "8. Exit"
     echo -n "Select an option (1-6): "
 }
 
@@ -86,21 +99,27 @@ while true; do
 
     case $option in
         1)
-            geth_logs
+            geth_version
             ;;
-        2)
-            story_logs
+        2) 
+            story_version
             ;;
         3)
-            sync_status
+            geth_logs
             ;;
         4)
-            geth_status
+            story_logs
             ;;
         5)
-            story_status
+            sync_status
             ;;
         6)
+            geth_status
+            ;;
+        7)
+            story_status
+            ;;
+        8)
             print_info "Exiting..."
             exit 0
             ;;
