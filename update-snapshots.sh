@@ -132,6 +132,7 @@ archive() {
                     sudo cp "$private_key_path" "$backup_path"
                     print_info "Private key backed up successfully!"
                     rm -rf "$HOME/.story/geth/iliad/geth"
+                    mkdir -p /root/.story/geth/iliad/geth
                     print_info "Old Geth snapshot deleted."
 
                     # Download the new Geth snapshot
@@ -154,6 +155,7 @@ archive() {
         else
             # If no old Geth snapshot found, download the new one directly
             print_info "No old Geth snapshot found. Downloading the new one..."
+            mkdir -p /root/.story/geth/iliad/geth
             if ! curl -L https://snapshots.mandragora.io/geth_snapshot.lz4 | lz4 -d | tar -xvf - -C "$HOME/.story/geth/iliad/geth"; then
                 print_error "Failed to download Geth snapshot"
                 exit 1
