@@ -133,6 +133,18 @@ install_dependencies() {
 
     # Display the Go version to confirm the installation
     go version
+
+    # Check if Cosmovisor is already installed
+    if command -v cosmovisor >/dev/null 2>&1; then
+       print_info "Cosmovisor is already installed."
+     else
+        # Install Cosmovisor if not installed
+           print_info "Cosmovisor not found. Installing..."
+           go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
+        export PATH=$PATH:$(go env GOPATH)/bin
+       print_info "Cosmovisor installed successfully."
+    fi
+
     
     # Return to node management menu
     node_management_menu
