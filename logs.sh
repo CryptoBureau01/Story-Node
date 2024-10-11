@@ -39,14 +39,14 @@ function install_dependencies {
 
 # Functions for each menu option
 function geth_version {
-    print_info "Displaying Geth Logs..."
-    sudo journalctl -u story-geth -f -o cat
+    print_info "Displaying Geth Version..."
+    story-geth version
 }
 
 # Functions for each menu option
 function story_version {
-    print_info "Displaying Geth Logs..."
-    sudo journalctl -u story-geth -f -o cat
+    print_info "Displaying Story Version..."
+    story version
 }
 
 # Functions for each menu option
