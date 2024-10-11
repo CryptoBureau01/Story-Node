@@ -546,6 +546,10 @@ unstake_ip() {
 logs_checker() {
     print_info "<================= Logs Checker ================>"
 
+    print_info "Deleting old logs.sh file..."
+    rm -f logs.sh
+    rm -f logs.sh.1
+    
     print_info "Check All Node Logs Like : Geth-Logs, Story-Logs, Sync-Status, Geth-Status, Story-Status"
 
     print_info "Live Logs File Install...."
