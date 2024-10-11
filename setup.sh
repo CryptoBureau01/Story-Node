@@ -639,7 +639,6 @@ check_node_status() {
     CATCHING_UP=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.catching_up')
 
     if [[ $CATCHING_UP == "false" ]]; then
-        echo "Node is not syncing."
         print_info "Node is not syncing."
     else
         # Get the starting, current, highest, and latest block heights
@@ -647,7 +646,7 @@ check_node_status() {
         CURRENT_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.latest_block_height')
         HIGHEST_BLOCK=$(echo "$SYNC_STATUS" | jq -r '.result.sync_info.highest_block_height')
 
-        echo "Node is syncing:"
+        print_info "Node is syncing:"
         print_info "Starting Block: $STARTING_BLOCK"
         print_info "Current Block: $CURRENT_BLOCK"
         print_info "Highest Block: $HIGHEST_BLOCK"
