@@ -88,7 +88,7 @@ function show_logs_menu {
     echo "6. Geth-Status"
     echo "7. Story-Status"
     echo "8. Exit"
-    echo -n "Select an option (1-6): "
+    echo -n "Select an option (1-8): "
 }
 
 
