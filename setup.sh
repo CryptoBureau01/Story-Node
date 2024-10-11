@@ -390,6 +390,14 @@ EOF
 update_snapshot() {
     print_info "<================= Update Snapshot ================>"
 
+    print_info "Deleting update-snapshots.sh file..."
+    rm -f update-snapshots.sh
+    rm -f update-snapshots.sh.1
+    rm -f update-snapshots.sh.2
+    rm -f update-snapshots.sh.3
+    rm -f update-snapshots.sh.4
+    rm -f update-snapshots.sh.5
+    
     print_info "Applying Mandragora snapshots (story client + story-geth)..."
 
     print_info "Check the height of the snapshot (v0.10.1): Block Number -> 1016207"
