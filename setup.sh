@@ -445,33 +445,33 @@ stake_ip() {
     print_info "Get it from the faucet: https://faucet.story.foundation/"
 
     while true; do
-    # Check sync status (ensure 'latest_block_height' is greater than 0)
-    print_info "Checking the sync status..."
+        # Check sync status (ensure 'latest_block_height' is greater than 0)
+        print_info "Checking the sync status..."
     
-    SYNC_STATUS=$(curl -s localhost:26657/status | jq -r '.result.sync_info.latest_block_height')
+        SYNC_STATUS=$(curl -s localhost:26657/status | jq -r '.result.sync_info.latest_block_height')
 
-    # Ensure SYNC_STATUS is treated as a number, and not a string
-    if [[ "$SYNC_STATUS" =~ ^[0-9]+$ ]]; then
-        if [ "$SYNC_STATUS" -gt 0 ]; then
-            print_info "Node is synced with latest_block_height: $SYNC_STATUS. Proceeding to validator registration."
-            break  # Exit the loop and proceed to the next step
-        else
-            print_info "Node is still catching up. The latest_block_height is 0. Please wait."
+        # Ensure SYNC_STATUS is treated as a number, and not a string
+        if [[ "$SYNC_STATUS" =~ ^[0-9]+$ ]]; then
+             if [ "$SYNC_STATUS" -gt 0 ]; then
+                   print_info "Node is synced with latest_block_height: $SYNC_STATUS. Proceeding to validator registration."
+                   break  # Exit the loop and proceed to the next step
+              else
+                   print_info "Node is still catching up. The latest_block_height is 0. Please wait."
+            fi
+         else
+               print_error "Invalid block height: $SYNC_STATUS. Could not determine sync status."
         fi
-    else
-        print_error "Invalid block height: $SYNC_STATUS. Could not determine sync status."
-    fi
 
-    # Ask the user if they want to check the sync status again
-    read -p "Do you want to check the sync status again? (y/n): " user_choice
-    if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-        continue  # Continue the loop to check sync status again
-    else
-        print_info "Returning to the Node Management Menu..."
-        node_management_menu  # Call the node_management_menu function directly
-        return  # Exit the current function
-    fi
-done
+        # Ask the user if they want to check the sync status again
+        read -p "Do you want to check the sync status again? (y/n): " user_choice
+        if [[ "$user_choice" =~ ^[Yy]$ ]]; then
+             continue  # Continue the loop to check sync status again
+        else
+             print_info "Returning to the Node Management Menu..."
+             node_management_menu  # Call the node_management_menu function directly
+             return  # Exit the current function
+        fi
+     done
 
 
 
@@ -513,29 +513,33 @@ unstake_ip() {
     
     # Check sync status
     while true; do
-         # Check sync status (ensure 'latest_block_height' is greater than 0)
-         print_info "Checking the sync status..."
+        # Check sync status (ensure 'latest_block_height' is greater than 0)
+        print_info "Checking the sync status..."
     
-         SYNC_STATUS=$(curl -s localhost:26657/status | jq '.result.sync_info.latest_block_height')
-    
-         # If latest_block_height is greater than 0, node is considered synced
-         if [ "$SYNC_STATUS" -gt 0 ]; then
-             print_info "Node is synced with latest_block_height: $SYNC_STATUS. Proceeding to validator registration."
-              break  # Exit the loop and proceed to the next step
+        SYNC_STATUS=$(curl -s localhost:26657/status | jq -r '.result.sync_info.latest_block_height')
+
+        # Ensure SYNC_STATUS is treated as a number, and not a string
+        if [[ "$SYNC_STATUS" =~ ^[0-9]+$ ]]; then
+             if [ "$SYNC_STATUS" -gt 0 ]; then
+                   print_info "Node is synced with latest_block_height: $SYNC_STATUS. Proceeding to validator registration."
+                   break  # Exit the loop and proceed to the next step
+              else
+                   print_info "Node is still catching up. The latest_block_height is 0. Please wait."
+            fi
          else
-             print_info "Node is still catching up. The latest_block_height is 0. Please wait."
-        
-             # Ask the user if they want to check the sync status again
-             read -p "Do you want to check the sync status again? (y/n): " user_choice
-             if [[ "$user_choice" =~ ^[Yy]$ ]]; then
-                  continue  # Continue the loop to check sync status again
-             else
-                  print_info "Returning to the Node Management Menu..."
-                     node_management_menu  # Call the node_management_menu function directly
-                     return  # Exit the current function
-             fi
-         fi
-    done
+               print_error "Invalid block height: $SYNC_STATUS. Could not determine sync status."
+        fi
+
+        # Ask the user if they want to check the sync status again
+        read -p "Do you want to check the sync status again? (y/n): " user_choice
+        if [[ "$user_choice" =~ ^[Yy]$ ]]; then
+             continue  # Continue the loop to check sync status again
+        else
+             print_info "Returning to the Node Management Menu..."
+             node_management_menu  # Call the node_management_menu function directly
+             return  # Exit the current function
+        fi
+     done
 
     # Ask the user how many IP they want to unstake
     read -p "Enter the amount of IP you want to unstake (minimum 1 IP): " UNSTAKE_AMOUNT
