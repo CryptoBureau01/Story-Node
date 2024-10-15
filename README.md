@@ -14,20 +14,20 @@ Story raised $140M from Tier1 investors. Story is a blockchain making IP protect
 
 
 
-**Follow our TG : https://t.me/CryptoBuroOfficial**
+**Follow our TG : https://t.me/CryptoBureau01**
 
 ## Tool Installation Command
 
 To install the necessary tools for managing your Story Protocol node, run the following command in your terminal:
 
 ```bash
-cd $HOME && wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/setup.sh && chmod +x setup.sh && ./setup.sh
+cd $HOME && wget https://raw.githubusercontent.com/CryptoBureau01/Story-Node/main/setup.sh && chmod +x setup.sh && ./setup.sh
 ```
 
 
 # Command Breakdown:
 - cd $HOME: Changes the current directory to the home directory of the user.
-- wget https://raw.githubusercontent.com/CryptoBuroMaster/Story-Node/main/setup.sh: Downloads the setup.sh script from the specified GitHub repository.
+- wget https://raw.githubusercontent.com/CryptoBureau01/Story-Node/main/setup.sh: Downloads the setup.sh script from the specified GitHub repository.
 - chmod +x setup.sh: Grants execute permissions to the downloaded script, allowing it to be run as a program.
 - ./setup.sh: Executes the setup script to initiate the installation and configuration of the node management tools.
 
@@ -136,4 +136,4 @@ The script is interactive and waits for user input to select the desired operati
 This Auto Script for Node Management on the Story Protocol has been created by CryptoBuroMaster. It is a comprehensive solution designed to simplify and enhance the node management experience. By providing a clear and organized interface, it allows users to efficiently manage their nodes with ease. Whether you are a newcomer or an experienced user, this script empowers you to handle node operations seamlessly, ensuring that you can focus on what truly matters in your blockchain journey.
 
 
-**Join our TG : https://t.me/CryptoBuroOfficial**
+**Join our TG : https://t.me/CryptoBureau01**
