@@ -185,18 +185,10 @@ setup_story_geth() {
     fi
     print_info "Successfully downloaded Story-Geth binary."
 
-
-    # Make the binary executable
-    print_info "Making the binary executable..."
-    if ! chmod +x geth-linux-amd64; then
-        print_error "Failed to make the binary executable"
-        exit 1
-    fi
-
     
     # Move Story-Geth binary to go/bin and make it executable
     print_info "Moving Story-Geth binary to go/bin..."
-    if ! sudo cp $HOME/geth-linux-amd64 $HOME/go/bin/story-geth; then
+    if ! mv $HOME/geth-linux-amd64 $HOME/go/bin/story-geth; then
         print_error "Failed to move Story-Geth binary"
         exit 1
     fi
