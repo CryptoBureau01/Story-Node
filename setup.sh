@@ -179,23 +179,24 @@ setup_story_geth() {
     # Download the Story-Geth v0.9.3 binary
     print_info "Downloading Story-Geth v0.9.3..."
     cd "$HOME" || exit 1
-    if ! wget https://story-geth-binaries.s3.us-west-1.amazonaws.com/geth-public/geth-linux-amd64-0.9.3-b224fdf.tar.gz; then
+    if ! wget https://github.com/piplabs/story-geth/releases/download/v0.9.4/geth-linux-amd64; then
         print_error "Failed to download Story-Geth binary"
         exit 1
     fi
     print_info "Successfully downloaded Story-Geth binary."
 
-    # Extract Story-Geth v0.9.3 binary
-    print_info "Extracting Story-Geth v0.9.3..."
-    if ! tar -xvzf geth-linux-amd64-0.9.3-b224fdf.tar.gz; then
-        print_error "Failed to extract Story-Geth binary"
+
+    # Make the binary executable
+    print_info "Making the binary executable..."
+    if ! chmod +x geth-linux-amd64; then
+        print_error "Failed to make the binary executable"
         exit 1
     fi
-    print_info "Successfully extracted Story-Geth binary."
 
+    
     # Move Story-Geth binary to go/bin and make it executable
     print_info "Moving Story-Geth binary to go/bin..."
-    if ! mv geth-linux-amd64-0.9.3-b224fdf/geth "$HOME/go/bin/story-geth"; then
+    if ! sudo cp $HOME/geth-linux-amd64 $HOME/go/bin/story-geth; then
         print_error "Failed to move Story-Geth binary"
         exit 1
     fi
@@ -213,11 +214,7 @@ setup_story_geth() {
         print_error "Failed to check Story-Geth version"
         exit 1
     fi
-
-    # Cleanup
-    print_info "Cleaning up downloaded files..."
-    rm -f /root/geth-linux-amd64-0.9.3-b224fdf.tar.gz
-    rm -f /root/geth-linux-amd64-0.9.3-b224fdf
+    
 
     print_info "Story-Geth has been successfully updated to version 0.9.3!"
 
