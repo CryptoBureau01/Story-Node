@@ -77,7 +77,7 @@ install_dependencies() {
 
     # Update package lists and install general dependencies
     echo "Updating package lists and installing dependencies..."
-    if ! sudo apt update && sudo apt-get upgrade -y && sudo yum install bc && sudo apt install curl git make jq bc build-essential gcc unzip wget lz4 aria2 pv -y; then
+    if ! sudo apt update && sudo apt-get upgrade -y && sudo yum install bc && sudo apt install curl tar git make jq bc build-essential gcc unzip wget lz4 aria2 pv -y; then
         print_error "Failed to install dependencies. Please check the logs."
         exit 1
     fi
